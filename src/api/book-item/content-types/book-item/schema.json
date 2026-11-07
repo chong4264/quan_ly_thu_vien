@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "book_items",
+  "info": {
+    "singularName": "book-item",
+    "pluralName": "book-items",
+    "displayName": "BookItem"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "barcode": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "book_status": {
+      "type": "enumeration",
+      "enum": [
+        "available",
+        "borrowed",
+        "reserved",
+        "maintenance",
+        "lost"
+      ]
+    },
+    "book": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::book.book",
+      "inversedBy": "book_items"
+    },
+    "borrow_records": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::borrow-record.borrow-record",
+      "mappedBy": "book_item"
+    }
+  }
+}
