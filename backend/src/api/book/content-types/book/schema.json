@@ -1,0 +1,115 @@
+{
+  "kind": "collectionType",
+  "collectionName": "books",
+  "info": {
+    "singularName": "book",
+    "pluralName": "books",
+    "displayName": "Book"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "isbn": {
+      "type": "string",
+      "unique": true
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "author": {
+      "type": "string",
+      "required": true
+    },
+    "coAuthors": {
+      "type": "string"
+    },
+    "publisher": {
+      "type": "string"
+    },
+    "publishYear": {
+      "type": "integer"
+    },
+    "language": {
+      "type": "enumeration",
+      "enum": [
+        "vie",
+        "eng",
+        "fra",
+        "zho",
+        "rus"
+      ],
+      "default": "vie"
+    },
+    "pages": {
+      "type": "integer"
+    },
+    "edition": {
+      "type": "integer"
+    },
+    "price": {
+      "type": "decimal"
+    },
+    "abstract": {
+      "type": "text"
+    },
+    "tags": {
+      "type": "json"
+    },
+    "ddcMain": {
+      "type": "string"
+    },
+    "callNumber": {
+      "type": "string"
+    },
+    "cover": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "allowHomeLoan": {
+      "type": "boolean",
+      "default": true
+    },
+    "referenceOnly": {
+      "type": "boolean",
+      "default": false
+    },
+    "priorityGifted": {
+      "type": "boolean",
+      "default": false
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "active",
+        "low_stock",
+        "restricted",
+        "discontinued"
+      ],
+      "default": "active"
+    },
+    "shelf": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::shelf.shelf",
+      "inversedBy": "books"
+    },
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::category.category",
+      "inversedBy": "books"
+    },
+    "copies": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::copy.copy",
+      "mappedBy": "book"
+    }
+  }
+}

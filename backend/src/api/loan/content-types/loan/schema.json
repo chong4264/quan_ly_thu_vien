@@ -1,0 +1,53 @@
+{
+  "kind": "collectionType",
+  "collectionName": "loans",
+  "info": {
+    "singularName": "loan",
+    "pluralName": "loans",
+    "displayName": "Loan"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "loanedAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "borrowing",
+        "overdue",
+        "returned"
+      ],
+      "default": "borrowing"
+    },
+    "note": {
+      "type": "text"
+    },
+    "patron": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::patron.patron",
+      "inversedBy": "loans"
+    },
+    "loanItems": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::loan-item.loan-item",
+      "mappedBy": "loan"
+    },
+    "librarian": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    }
+  }
+}

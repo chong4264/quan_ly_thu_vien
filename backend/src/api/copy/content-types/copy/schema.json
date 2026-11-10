@@ -1,0 +1,66 @@
+{
+  "kind": "collectionType",
+  "collectionName": "copies",
+  "info": {
+    "singularName": "copy",
+    "pluralName": "copies",
+    "displayName": "Copy"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "accessionNo": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "barcode": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "condition": {
+      "type": "enumeration",
+      "enum": [
+        "new",
+        "good",
+        "worn",
+        "damaged"
+      ],
+      "default": "good"
+    },
+    "circulationStatus": {
+      "type": "enumeration",
+      "enum": [
+        "available",
+        "borrowed",
+        "processing",
+        "lost"
+      ],
+      "default": "available"
+    },
+    "importedAt": {
+      "type": "date"
+    },
+    "shelf": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::shelf.shelf",
+      "inversedBy": "copies"
+    },
+    "book": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::book.book",
+      "inversedBy": "copies"
+    },
+    "loanItems": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::loan-item.loan-item",
+      "mappedBy": "copy"
+    }
+  }
+}

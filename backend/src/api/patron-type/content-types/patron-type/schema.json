@@ -1,0 +1,42 @@
+{
+  "kind": "collectionType",
+  "collectionName": "patron_types",
+  "info": {
+    "singularName": "patron-type",
+    "pluralName": "patron-types",
+    "displayName": "Patron Type"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "maxBooks": {
+      "type": "integer",
+      "default": 3
+    },
+    "loanDays": {
+      "type": "integer",
+      "default": 14
+    },
+    "maxRenewals": {
+      "type": "integer",
+      "default": 1
+    },
+    "renewDays": {
+      "type": "integer",
+      "default": 7
+    },
+    "patrons": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::patron.patron",
+      "mappedBy": "patronType"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "return_receipts",
+  "info": {
+    "singularName": "return-receipt",
+    "pluralName": "return-receipts",
+    "displayName": "Return Receipt"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "returnedAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "note": {
+      "type": "text"
+    },
+    "loanItem": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::loan-item.loan-item",
+      "inversedBy": "returnReceipt"
+    },
+    "librarian": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    }
+  }
+}

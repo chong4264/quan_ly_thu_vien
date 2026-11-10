@@ -1,0 +1,79 @@
+{
+  "kind": "collectionType",
+  "collectionName": "patrons",
+  "info": {
+    "singularName": "patron",
+    "pluralName": "patrons",
+    "displayName": "Patron"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "studentCode": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "fullName": {
+      "type": "string",
+      "required": true
+    },
+    "className": {
+      "type": "string"
+    },
+    "cardBarcode": {
+      "type": "string",
+      "unique": true
+    },
+    "email": {
+      "type": "email"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "parentName": {
+      "type": "string"
+    },
+    "parentPhone": {
+      "type": "string"
+    },
+    "homeroomTeacher": {
+      "type": "string"
+    },
+    "address": {
+      "type": "text"
+    },
+    "cardStatus": {
+      "type": "enumeration",
+      "enum": [
+        "active",
+        "warning",
+        "locked",
+        "expired"
+      ],
+      "default": "active"
+    },
+    "cardExpiresAt": {
+      "type": "date"
+    },
+    "patronType": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::patron-type.patron-type",
+      "inversedBy": "patrons"
+    },
+    "loans": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::loan.loan",
+      "mappedBy": "patron"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    }
+  }
+}

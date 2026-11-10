@@ -1,0 +1,45 @@
+{
+  "kind": "singleType",
+  "collectionName": "library_settings",
+  "info": {
+    "singularName": "library-setting",
+    "pluralName": "library-settings",
+    "displayName": "Library Setting"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "finePerDay": {
+      "type": "decimal",
+      "default": 1000
+    },
+    "damageCompensationRate": {
+      "type": "integer",
+      "default": 20
+    },
+    "lostCompensationRate": {
+      "type": "integer",
+      "default": 100
+    },
+    "autoLockAfterDays": {
+      "type": "integer",
+      "default": 30
+    },
+    "remindBeforeDays": {
+      "type": "integer",
+      "default": 2
+    },
+    "overdueRemindEvery": {
+      "type": "enumeration",
+      "enum": [
+        "daily",
+        "every_2_days",
+        "every_3_days",
+        "weekly"
+      ],
+      "default": "daily"
+    }
+  }
+}

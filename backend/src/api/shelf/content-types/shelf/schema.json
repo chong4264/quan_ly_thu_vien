@@ -1,0 +1,47 @@
+{
+  "kind": "collectionType",
+  "collectionName": "shelfs",
+  "info": {
+    "singularName": "shelf",
+    "pluralName": "shelfs",
+    "displayName": "Shelf"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "zone": {
+      "type": "string"
+    },
+    "floor": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "categories": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::category.category",
+      "mappedBy": "shelf"
+    },
+    "books": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::book.book",
+      "mappedBy": "shelf"
+    },
+    "copies": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::copy.copy",
+      "mappedBy": "shelf"
+    }
+  }
+}

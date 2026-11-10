@@ -1,0 +1,74 @@
+{
+  "kind": "collectionType",
+  "collectionName": "loan_items",
+  "info": {
+    "singularName": "loan-item",
+    "pluralName": "loan-items",
+    "displayName": "Loan Item"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "dueDate": {
+      "type": "date",
+      "required": true
+    },
+    "returnedAt": {
+      "type": "datetime"
+    },
+    "renewCount": {
+      "type": "integer",
+      "default": 0
+    },
+    "returnCondition": {
+      "type": "enumeration",
+      "enum": [
+        "normal",
+        "scratched",
+        "damaged",
+        "lost"
+      ]
+    },
+    "lateDays": {
+      "type": "integer",
+      "default": 0
+    },
+    "fine": {
+      "type": "decimal",
+      "default": 0
+    },
+    "fineCollected": {
+      "type": "boolean",
+      "default": false
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "borrowing",
+        "overdue",
+        "returned"
+      ],
+      "default": "borrowing"
+    },
+    "loan": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::loan.loan",
+      "inversedBy": "loanItems"
+    },
+    "copy": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::copy.copy",
+      "inversedBy": "loanItems"
+    },
+    "returnReceipt": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::return-receipt.return-receipt",
+      "mappedBy": "loanItem"
+    }
+  }
+}
