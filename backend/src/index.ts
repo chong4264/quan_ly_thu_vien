@@ -1,7 +1,7 @@
 import type { Core } from "@strapi/strapi";
 import mysql from "mysql2/promise";
 import { seedExtra } from "./seedExtra";
-import { ensureLibrarianRole, registerBookManagement } from "./utils/book-management";
+import { ensureLibrarianRole, ensureReaderPermissions, registerBookManagement } from "./utils/book-management";
 
 export default {
   async register({ strapi }: { strapi: Core.Strapi }) {
@@ -395,6 +395,7 @@ export default {
       console.error("❌ Lỗi khi nạp dữ liệu mẫu:", err.message || err);
     } finally {
       await ensureLibrarianRole(strapi);
+      await ensureReaderPermissions(strapi);
     }
   },
 };

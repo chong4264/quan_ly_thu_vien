@@ -23,10 +23,19 @@ export async function api(path, { method = 'GET', body } = {}) {
       clearToken();
       window.dispatchEvent(new Event('auth:expired'));
     }
-    if (res.status === 403) throw new Error('Tài khoản chưa được cấp quyền cho thao tác này');
+    if (res.status === 403) {
+      const message = data?.error?.message;
+      throw new Error(message && message !== 'Forbidden' ? message : 'Tài khoản chưa được cấp quyền cho thao tác này');
+    }
     throw new Error(data?.error?.message || `Lỗi ${res.status}`);
   }
   return data;
 }
 
 export const qs = (params) => new URLSearchParams(params).toString();
+
+/** Ghép URL tương đối của Strapi (ví dụ /uploads/anh.jpg) thành URL đầy đủ. */
+export const assetUrl = (url) => {
+  if (!url) return '';
+  return /^https?:\/\//i.test(url) ? url : `${API_URL}${url}`;
+};

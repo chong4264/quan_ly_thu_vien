@@ -1,7 +1,7 @@
 import type { Core } from "@strapi/strapi";
 import { errors } from "@strapi/utils";
 
-export const { ApplicationError, NotFoundError } = errors;
+export const { ApplicationError, ForbiddenError, NotFoundError, UnauthorizedError } = errors;
 
 export const UID = {
   shelf: "api::shelf.shelf",
@@ -32,6 +32,9 @@ export const addDays = (s: string, n: number) =>
   new Date(utc(s) + n * 86400000).toISOString().slice(0, 10);
 export const lateDays = (due: string, today = todayStr()) =>
   Math.max(0, Math.round((utc(today) - utc(due)) / 86400000));
+/** Số ngày từ mốc from đến mốc to (dương nếu to nằm sau from). */
+export const daysBetween = (from: string, to: string) =>
+  Math.round((utc(to) - utc(from)) / 86400000);
 export const startOfTodayISO = () => `${todayStr()}T00:00:00+07:00`;
 
 // ───── Cấu hình hệ thống ─────
