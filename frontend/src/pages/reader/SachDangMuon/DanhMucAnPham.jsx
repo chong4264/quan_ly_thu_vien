@@ -1,51 +1,322 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { assetUrl } from '../../../lib/api';
+import { fmtDate, money } from '../../../lib/format';
+import { renewMyLoan } from '../../../lib/reader-loans';
 import { useToast } from '../../../context/ToastContext';
 
-export default function DanhMucAnPham() {
-  const toast=useToast();
+const CARD_STATUS = {
+  active: 'Đang hoạt động',
+  warning: 'Cần chú ý',
+  locked: 'Đang bị khóa',
+  expired: 'Đã hết hạn',
+};
+
+function BookCover({ item }) {
+  const [broken, setBroken] = useState(false);
+  const src = assetUrl(item.coverUrl);
   return (
-    <>
-<div className="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">  <div className="lg:col-span-8 flex flex-col gap-space-lg"> <div className="flex items-center justify-between"> <div> <h2 className="font-headline-lg text-headline-lg text-on-surface">Danh mục ấn phẩm đang lưu giữ</h2> <p className="font-body-sm text-body-sm text-on-surface-variant">Thông tin chi tiết ấn phẩm, mã đăng ký cá biệt và trạng thái kiểm kê.</p> </div> <span className="font-label-sm text-label-sm text-outline uppercase tracking-wider bg-surface-container px-space-sm py-1 rounded-sm">
-            Cập nhật tự động
-          </span> </div>  <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col sm:flex-row gap-space-lg relative overflow-hidden transition-all hover:shadow-md"> <div className="sm:w-36 w-full flex-shrink-0 flex sm:flex-col items-center gap-space-sm"> <img className="w-24 sm:w-full h-36 sm:h-48 object-cover rounded shadow-sm" data-alt="Cover of an academic mathematics and differential geometry textbook with elegant blue geometric abstract lines, clean typography, educational publishing style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8Te1uxnnRQ5XedarHDvxED_LhPOaReqrXp3G9rR9fsXR4biNRfdLmLHcfU0yVQXdyNnQKm256REpzVY91JecO6s30jjAQY5Iuiz6mGkA08k_5fMqbVTUwUBEcDf9wN6ryviafyqmUHniwW2dspDt6JGkuV9gKWXrPbTw63JzkIhUrOlEHz3Os_JT9FPPJDWe17ThjGM8TIhfiJ4VE8SDEoHhTptIsuAZBJv52ZQ" /> <div className="flex-1 sm:w-full text-center"> <span className="inline-block w-full font-code-md text-code-md bg-surface-container-low text-on-surface px-1.5 py-0.5 rounded-sm">
-                DK-09412
-              </span> <span className="block font-label-sm text-label-sm text-outline mt-1">DDC: 512.5 T412A</span> </div> </div> <div className="flex-1 flex flex-col justify-between"> <div> <div className="flex flex-wrap items-center justify-between gap-space-xs mb-space-xs"> <span className="bg-tertiary-fixed text-tertiary font-label-sm text-label-sm px-2 py-0.5 rounded-sm font-semibold flex items-center gap-1"> <span className="material-symbols-outlined text-[14px]">timer</span> Còn 3 ngày
-                </span> <span className="font-label-sm text-label-sm text-outline">Gia hạn lần 1 / Tối đa 2</span> </div> <h3 className="font-headline-md text-headline-md text-on-surface leading-snug">
-                Đại số Tuyến tính & Hình học Vi phân Ứng dụng
-              </h3> <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-                Tác giả: GS.TS. Nguyễn Hữu Dũng — NXB Đại học Quốc gia Hà Nội (2022)
-              </p>  <div className="mt-space-md bg-surface-container-low p-space-md rounded-lg"> <div className="flex justify-between items-center font-label-md text-label-md text-on-surface"> <div className="flex flex-col"> <span className="font-label-sm text-label-sm text-on-surface-variant">Ngày mượn</span> <span className="font-code-md text-code-md font-semibold">27/10/2024</span> </div> <div className="flex flex-col text-right"> <span className="font-label-sm text-label-sm text-tertiary font-semibold">Hạn hoàn trả</span> <span className="font-code-md text-code-md font-bold text-tertiary">10/11/2024</span> </div> </div> <div className="mt-space-sm"> <div className="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">  <div className="bg-tertiary h-full w-[78%] rounded-full" /> </div> <div className="flex justify-between font-label-sm text-label-sm text-on-surface-variant mt-1"> <span>Đã mượn 11 ngày</span> <span className="text-tertiary font-semibold">Chu kỳ 14 ngày chuẩn</span> </div> </div> </div> </div>  <div className="mt-space-lg pt-space-md flex flex-wrap items-center gap-space-sm"> <button className="bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md px-space-md h-9 rounded-sm flex items-center gap-space-xs transition-colors shadow-sm" id="btn-renew-1" onClick={()=>toast("Gia hạn trực tuyến (+7 ngày)")}> <span className="material-symbols-outlined text-[18px]">update</span> <span>Gia hạn trực tuyến (+7 ngày)</span> </button> <button className="bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md px-space-md h-9 rounded-sm flex items-center gap-space-xs transition-colors" onClick={()=>toast("Xem vị trí quầy trả")}> <span className="material-symbols-outlined text-[18px]">pin_drop</span> <span>Xem vị trí quầy trả</span> </button> <span className="hidden font-label-sm text-label-sm text-secondary font-semibold items-center gap-1" id="renew-toast-1"> <span className="material-symbols-outlined text-[16px]">check_circle</span> Đã gia hạn đến 17/11/2024!
-              </span> </div> </div> </div>  <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col sm:flex-row gap-space-lg relative overflow-hidden transition-all hover:shadow-md"> <div className="sm:w-36 w-full flex-shrink-0 flex sm:flex-col items-center gap-space-sm"> <img className="w-24 sm:w-full h-36 sm:h-48 object-cover rounded shadow-sm" data-alt="Cover of the famous popular science book The Universe in a Nutshell by Stephen Hawking translated to Vietnamese with cosmological artistic illustration of deep space and gravity wells." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAihjTSoceRCknQvbmD-ZCTadvzZu6Vj-ff8NHNcJfOzAQ4ec9xmrcekfTAMcrfpRuDfHtQ5sDw8_dm4pwhalYukknR8ok0ZH5eTXiJBTri5Wj8nr3-SHvcYp6YZIGJacIlekMLpUqwe66azoEjfPssq-JgK6gEqAHk_0Q_S46Ecr0ELrZjYrwOMUDPQEpmwV_q_nHgJzS1D-gHiy_pTwRX6xZjUVmPAYwYRFBm8w" /> <div className="flex-1 sm:w-full text-center"> <span className="inline-block w-full font-code-md text-code-md bg-surface-container-low text-on-surface px-1.5 py-0.5 rounded-sm">
-                DK-11854
-              </span> <span className="block font-label-sm text-label-sm text-outline mt-1">DDC: 523.1 H392U</span> </div> </div> <div className="flex-1 flex flex-col justify-between"> <div> <div className="flex flex-wrap items-center justify-between gap-space-xs mb-space-xs"> <span className="bg-error-container text-error font-label-sm text-label-sm px-2 py-0.5 rounded-sm font-bold flex items-center gap-1"> <span className="material-symbols-outlined text-[14px]">warning</span> Quá hạn 7 ngày
-                </span> <span className="font-code-md text-code-md text-error font-bold">
-                  Phạt phát sinh: 7.000 đ
-                </span> </div> <h3 className="font-headline-md text-headline-md text-on-surface leading-snug">
-                Vũ Trụ Trong Vỏ Hạt Dẻ
-              </h3> <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-                Tác giả: Stephen Hawking (Bản dịch: Tuấn Minh) — NXB Trẻ (2021)
-              </p>  <div className="mt-space-md bg-surface-container-low p-space-md rounded-lg"> <div className="flex justify-between items-center font-label-md text-label-md text-on-surface"> <div className="flex flex-col"> <span className="font-label-sm text-label-sm text-on-surface-variant">Ngày mượn</span> <span className="font-code-md text-code-md font-semibold">18/10/2024</span> </div> <div className="flex flex-col text-right"> <span className="font-label-sm text-label-sm text-error font-semibold">Hạn gốc</span> <span className="font-code-md text-code-md font-bold text-error">01/11/2024 (Đã trễ)</span> </div> </div> <div className="mt-space-sm"> <div className="w-full bg-error-container h-2 rounded-full overflow-hidden"> <div className="bg-error h-full w-full rounded-full" /> </div> <div className="flex justify-between font-label-sm text-label-sm text-error font-semibold mt-1"> <span>Đã quá chu kỳ 14 ngày</span> <span>Trễ 7 ngày (+1.000 đ/ngày)</span> </div> </div> </div> </div>  <div className="mt-space-lg pt-space-md flex flex-col gap-space-sm"> <div className="flex flex-wrap items-center gap-space-sm"> <button className="bg-surface-container-high text-outline cursor-not-allowed font-label-md text-label-md px-space-md h-9 rounded-sm flex items-center gap-space-xs shadow-none" disabled onClick={()=>toast("Gia hạn trực tuyến (Bị khóa)")}> <span className="material-symbols-outlined text-[18px]">lock</span> <span>Gia hạn trực tuyến (Bị khóa)</span> </button> <button className="bg-error text-on-error hover:opacity-90 font-label-md text-label-md px-space-md h-9 rounded-sm flex items-center gap-space-xs transition-opacity shadow-sm" onClick={()=>toast("Đến quầy trả sách & Nộp phạt")}> <span className="material-symbols-outlined text-[18px]">assignment_return</span> <span>Đến quầy trả sách & Nộp phạt</span> </button> </div>  <p className="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1.5 mt-1"> <span className="material-symbols-outlined text-outline text-[16px]">info</span> <span>Sách đã quá hạn hoàn trả quy định. Vui lòng mang sách nguyên trạng tới Quầy Lưu thông số 01 (Tầng 1 Nhà C) để nhân viên quét barcode và thu hồi.</span> </p> </div> </div> </div>  <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md"> <div className="flex items-center justify-between"> <div> <span className="font-headline-sm text-headline-sm text-on-surface block">Lịch sử tuân thủ thời hạn (Học kỳ I / 2024-2025)</span> <span className="font-body-sm text-body-sm text-on-surface-variant">Chỉ số uy tín độc giả: 92/100 (Hạng A - Độc giả tích cực)</span> </div> <span className="font-label-sm text-label-sm font-code-md text-secondary bg-surface-container-low px-2 py-1 rounded-sm">
-              Đúng hạn 8/9 lượt
-            </span> </div>  <div className="w-full h-24 flex items-end justify-between gap-space-sm pt-4"> <div className="flex-1 flex flex-col items-center gap-1"> <span className="font-code-md text-[10px] text-on-surface-variant">T8</span> <div className="w-full bg-secondary-fixed-dim rounded-t h-12" /> <span className="font-label-sm text-[10px] text-secondary">3 cuốn</span> </div> <div className="flex-1 flex flex-col items-center gap-1"> <span className="font-code-md text-[10px] text-on-surface-variant">T9</span> <div className="w-full bg-secondary-fixed-dim rounded-t h-16" /> <span className="font-label-sm text-[10px] text-secondary">4 cuốn</span> </div> <div className="flex-1 flex flex-col items-center gap-1"> <span className="font-code-md text-[10px] text-on-surface-variant">T10</span> <div className="w-full bg-primary-container rounded-t h-20" /> <span className="font-label-sm text-[10px] text-primary">5 cuốn</span> </div> <div className="flex-1 flex flex-col items-center gap-1"> <span className="font-code-md text-[10px] text-on-surface-variant">T11</span> <div className="w-full bg-error rounded-t h-8" /> <span className="font-label-sm text-[10px] text-error">2 cuốn</span> </div> <div className="flex-1 flex flex-col items-center gap-1 opacity-40"> <span className="font-code-md text-[10px] text-on-surface-variant">T12</span> <div className="w-full bg-surface-container-high rounded-t h-2" /> <span className="font-label-sm text-[10px] text-outline">--</span> </div> </div> </div> </div>  <div className="lg:col-span-4 flex flex-col gap-space-lg">  <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md" id="quay-tra-sach"> <div className="flex items-center gap-space-sm text-primary"> <span className="material-symbols-outlined text-[24px]">local_convenience_store</span> <h3 className="font-headline-sm text-headline-sm text-on-surface">Điểm hẹn trả sách tại trường</h3> </div>  <div className="bg-surface-container-low rounded-lg p-space-md flex flex-col gap-space-xs"> <div className="flex items-center justify-between"> <span className="font-label-sm text-label-sm text-on-surface-variant uppercase">Địa điểm chỉ định</span> <span className="bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm px-2 py-0.5 rounded-sm font-semibold">Đang mở cửa</span> </div> <span className="font-headline-sm text-headline-sm font-bold text-on-surface">Quầy Lưu thông số 01 — Tầng 1 Nhà C</span> <span className="font-body-sm text-body-sm text-on-surface-variant">Khu phức hợp Thư viện Thông minh, THPT Chuyên Chu Văn An</span> </div>  <div className="flex flex-col gap-space-xs text-on-surface-variant font-label-md text-label-md"> <div className="flex justify-between py-1 border-b border-surface-container"> <span className="text-on-surface">Ca sáng:</span> <span className="font-code-md text-code-md text-on-surface">07:30 — 11:30 (Thứ 2 - Thứ 7)</span> </div> <div className="flex justify-between py-1 border-b border-surface-container"> <span className="text-on-surface">Ca chiều:</span> <span className="font-code-md text-code-md text-on-surface">13:30 — 17:00 (Thứ 2 - Thứ 6)</span> </div> <div className="flex justify-between py-1"> <span className="text-on-surface">Hộp nhận sách tự động 24/7:</span> <span className="text-secondary font-semibold">Sảnh ngoài Nhà C</span> </div> </div>  <div className="pt-space-xs flex flex-col gap-space-xs"> <button className="w-full bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md py-2 rounded-sm flex items-center justify-center gap-space-xs transition-colors" onClick={()=>toast("Đặt lịch hẹn trả sách nhanh")}> <span className="material-symbols-outlined text-[18px]">event_available</span> <span>Đặt lịch hẹn trả sách nhanh</span> </button> <span className="hidden text-center font-label-sm text-label-sm text-secondary font-semibold mt-1" id="appointment-status">
-              Lịch hẹn đã ghi nhận: 14:00 hôm nay tại Quầy 01.
-            </span> </div> </div>  <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md" id="quy-dinh-tra"> <div className="flex items-center gap-space-sm text-tertiary"> <span className="material-symbols-outlined text-[24px]">gavel</span> <h3 className="font-headline-sm text-headline-sm text-on-surface">Nội quy & Quy định mượn trả</h3> </div> <div className="flex flex-col gap-space-md font-body-sm text-body-sm text-on-surface-variant">  <div className="flex items-start gap-space-sm"> <div className="w-6 h-6 rounded bg-surface-container flex items-center justify-center text-primary font-bold flex-shrink-0 mt-0.5">
-                1
-              </div> <div> <strong className="text-on-surface block font-label-md text-label-md">Thời hạn mượn tiêu chuẩn:</strong>
-                Mỗi học sinh được mượn tối đa <strong>05 cuốn</strong> cùng lúc trong thời hạn <strong>14 ngày</strong> kể từ ngày quét mã ĐKCB tại quầy.
-              </div> </div>  <div className="flex items-start gap-space-sm"> <div className="w-6 h-6 rounded bg-surface-container flex items-center justify-center text-primary font-bold flex-shrink-0 mt-0.5">
-                2
-              </div> <div> <strong className="text-on-surface block font-label-md text-label-md">Quy định gia hạn trực tuyến:</strong>
-                Chỉ được gia hạn tối đa <strong>02 lần (+7 ngày/lần)</strong>. Điều kiện: Bản in không có người khác đặt trước và sách <strong>chưa rơi vào trạng thái quá hạn</strong>.
-              </div> </div>  <div className="flex items-start gap-space-sm"> <div className="w-6 h-6 rounded bg-surface-container flex items-center justify-center text-error font-bold flex-shrink-0 mt-0.5">
-                3
-              </div> <div> <strong className="text-error block font-label-md text-label-md">Chế tài phạt quá hạn:</strong>
-                Mức phạt: <strong>1.000 đ / ngày / cuốn</strong> tính từ ngày kế tiếp của hạn hoàn trả. Phí phạt sẽ được thanh toán trực tiếp qua cổng học phí hoặc tại quầy thư viện.
-              </div> </div>  <div className="flex items-start gap-space-sm"> <div className="w-6 h-6 rounded bg-surface-container flex items-center justify-center text-error font-bold flex-shrink-0 mt-0.5">
-                4
-              </div> <div> <strong className="text-error block font-label-md text-label-md">Xử lý vi phạm kỷ luật:</strong>
-                Nếu giữ sách quá hạn <strong>trên 15 ngày</strong>, hệ thống tự động khóa quyền mượn sách mới và <strong>trừ 5 điểm rèn luyện</strong> theo khung đánh giá học sinh năm học.
-              </div> </div> </div>  <div className="bg-surface-container-low p-space-sm rounded text-center"> <span className="font-label-sm text-label-sm text-on-surface-variant block">Cần hỗ trợ giải trình hoặc báo mất sách?</span> <span className="font-code-md text-code-md text-primary font-bold">Hotline: (024) 3823 4567 - Ext: 104</span> </div> </div>  <div className="bg-primary text-on-primary rounded-xl p-space-lg shadow-sm flex flex-col justify-between"> <div> <div className="flex items-center gap-space-xs mb-space-xs text-primary-fixed"> <span className="material-symbols-outlined text-[20px]">lightbulb</span> <span className="font-label-sm text-label-sm uppercase tracking-wider font-bold">Mẹo độc giả thông minh</span> </div> <h4 className="font-headline-sm text-headline-sm font-semibold">Tự động trả sách qua Box 24/7</h4> <p className="font-body-sm text-body-sm text-on-primary-container mt-1 opacity-90">
-              Bạn có thể thả sách vào thùng RFID ngoài sảnh Nhà C vào bất kỳ khung giờ nào kể cả ban đêm. Hệ thống sẽ tự động gửi email biên nhận hoàn tất.
-            </p> </div> <div className="mt-space-md pt-space-xs flex justify-between items-center text-on-primary-container"> <span className="font-code-md text-[11px]">RFID Check-in v2.4</span> <span className="font-label-sm text-label-sm underline cursor-pointer hover:text-on-primary">Xem video hướng dẫn</span> </div> </div> </div> </div>
-    </>
+    <div className="w-24 sm:w-full h-36 sm:h-48 rounded shadow-sm overflow-hidden bg-surface-container">
+      {src && !broken ? (
+        <img
+          className="w-full h-full object-cover"
+          src={src}
+          alt={`Bìa sách ${item.title}`}
+          onError={() => setBroken(true)}
+        />
+      ) : (
+        <div className="w-full h-full flex flex-col items-center justify-center gap-1 bg-gradient-to-br from-primary-container to-inverse-surface text-on-primary px-2 text-center">
+          <span className="material-symbols-outlined text-[28px]">auto_stories</span>
+          <span className="font-label-sm text-label-sm line-clamp-2">{item.title}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RenewButton({ item, busy, onRenew }) {
+  const disabled = busy || !item.canRenew;
+  return (
+    <div className="flex flex-col gap-1">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => onRenew(item)}
+        title={item.renewBlockedReason || `Gia hạn thêm ${item.renewDays} ngày`}
+        className={`font-label-md text-label-md px-space-md h-9 rounded-sm flex items-center justify-center gap-space-xs transition-colors shadow-sm ${
+          disabled
+            ? 'bg-surface-container-high text-outline cursor-not-allowed'
+            : 'bg-primary-container hover:bg-primary text-on-primary'
+        }`}
+      >
+        <span className="material-symbols-outlined text-[18px]">{item.canRenew ? 'update' : 'lock'}</span>
+        <span>{busy ? 'Đang gia hạn…' : 'Gia hạn trực tuyến'}</span>
+      </button>
+      {item.renewBlockedReason && (
+        <span className="font-label-sm text-label-sm text-on-surface-variant">{item.renewBlockedReason}</span>
+      )}
+    </div>
+  );
+}
+
+export default function DanhMucAnPham({ payload, loading, error, onRetry, onReload }) {
+  const toast = useToast();
+  const [busyId, setBusyId] = useState(null);
+  const linked = payload?.linked;
+  const items = payload?.data ?? [];
+  const patron = payload?.patron;
+  const settings = payload?.settings;
+  const type = patron?.patronType;
+
+  const renew = async (item) => {
+    setBusyId(item.loanItemId);
+    try {
+      const result = await renewMyLoan(item.loanItemId);
+      toast(`Gia hạn thành công, hạn mới ${fmtDate(result.newDueDate)}`);
+    } catch (e) {
+      toast(e.message);
+    } finally {
+      await onReload();
+      setBusyId(null);
+    }
+  };
+
+  if (error && !payload) {
+    return (
+      <div className="bg-error-container text-on-error-container rounded-xl p-space-lg flex flex-col sm:flex-row sm:items-center justify-between gap-space-md">
+        <div className="flex items-start gap-space-sm">
+          <span className="material-symbols-outlined text-error">cloud_off</span>
+          <div>
+            <p className="font-body-md text-body-md font-semibold">Không tải được danh sách sách đang mượn</p>
+            <p className="font-body-sm text-body-sm mt-0.5">{error}</p>
+          </div>
+        </div>
+        <button onClick={onRetry} className="h-9 px-space-md rounded-sm bg-error text-on-error font-label-md text-label-md">Thử lại</button>
+      </div>
+    );
+  }
+
+  if (loading && !payload) {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
+        <div className="lg:col-span-8 flex flex-col gap-space-lg">
+          {[0, 1].map((n) => (
+            <div key={n} className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm animate-pulse flex gap-space-lg">
+              <div className="w-24 h-36 rounded bg-surface-container" />
+              <div className="flex-1 flex flex-col gap-3 py-2">
+                <div className="h-4 w-32 bg-surface-container rounded" />
+                <div className="h-6 w-2/3 bg-surface-container rounded" />
+                <div className="h-4 w-1/2 bg-surface-container rounded" />
+                <div className="h-16 w-full bg-surface-container rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="lg:col-span-4 bg-surface-container-lowest rounded-xl p-space-lg shadow-sm animate-pulse h-72" />
+      </div>
+    );
+  }
+
+  if (linked === false) {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
+        <div className="lg:col-span-8 bg-surface-container-lowest rounded-xl p-space-xl shadow-sm text-center flex flex-col items-center gap-space-md">
+          <div className="w-14 h-14 rounded-full bg-surface-container text-primary flex items-center justify-center">
+            <span className="material-symbols-outlined text-[30px]">badge</span>
+          </div>
+          <div>
+            <h2 className="font-headline-md text-headline-md text-on-surface">Chưa có hồ sơ độc giả</h2>
+            <p className="font-body-md text-body-md text-on-surface-variant mt-1 max-w-xl mx-auto">
+              Tài khoản đăng nhập chưa được gắn với hồ sơ Patron trong Strapi. Thủ thư cần mở hồ sơ độc giả và chọn đúng tài khoản ở trường <strong>user</strong> để bật các tính năng mượn sách cá nhân.
+            </p>
+          </div>
+          <Link to="/tra-cuu-sach" className="h-9 px-space-md rounded-sm bg-primary-container text-on-primary font-label-md text-label-md flex items-center">
+            Tra cứu danh mục sách
+          </Link>
+        </div>
+        <div className="lg:col-span-4 bg-surface-container-lowest rounded-xl p-space-lg shadow-sm">
+          <h3 className="font-headline-sm text-headline-sm text-on-surface">Cần hỗ trợ?</h3>
+          <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">Liên hệ bàn thủ thư tại Thư viện để được liên kết tài khoản với hồ sơ độc giả.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
+      <div className="lg:col-span-8 flex flex-col gap-space-lg">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface">Danh mục ấn phẩm đang lưu giữ</h2>
+            <p className="font-body-sm text-body-sm text-on-surface-variant">Thông tin chi tiết ấn phẩm, mã đăng ký cá biệt và trạng thái kiểm kê.</p>
+          </div>
+          <span className="font-label-sm text-label-sm text-outline uppercase tracking-wider bg-surface-container px-space-sm py-1 rounded-sm">
+            {loading ? 'Đang cập nhật…' : `${items.length} bản sao`}
+          </span>
+        </div>
+
+        {error && payload && (
+          <div className="bg-error-container text-on-error-container px-space-md py-space-sm rounded-lg font-body-sm text-body-sm flex items-center justify-between gap-space-sm">
+            <span>Không cập nhật được dữ liệu mới nhất: {error}</span>
+            <button onClick={onRetry} className="font-label-md text-label-md underline">Thử lại</button>
+          </div>
+        )}
+
+        {!items.length ? (
+          <div className="bg-surface-container-lowest rounded-xl p-space-xl shadow-sm text-center flex flex-col items-center gap-space-md">
+            <span className="material-symbols-outlined text-[38px] text-outline">menu_book</span>
+            <div>
+              <h3 className="font-headline-sm text-headline-sm text-on-surface">Không có sách đang mượn</h3>
+              <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">Bạn đang không giữ bản sao nào. Hãy tra cứu danh mục để tìm sách phù hợp.</p>
+            </div>
+            <Link to="/tra-cuu-sach" className="h-9 px-space-md rounded-sm bg-primary-container text-on-primary font-label-md text-label-md flex items-center">Tra cứu sách</Link>
+          </div>
+        ) : (
+          items.map((item) => {
+            const overdue = item.lateDays > 0;
+            const statusClass = overdue
+              ? 'bg-error-container text-error'
+              : item.dueSoon
+                ? 'bg-tertiary-fixed text-tertiary'
+                : 'bg-secondary-container text-on-secondary-container';
+            return (
+              <div key={item.loanItemId} className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col sm:flex-row gap-space-lg relative overflow-hidden transition-all hover:shadow-md">
+                <div className="sm:w-36 w-full flex-shrink-0 flex sm:flex-col items-center gap-space-sm">
+                  <BookCover item={item} />
+                  <div className="flex-1 sm:w-full text-center">
+                    <span className="inline-block w-full font-code-md text-code-md bg-surface-container-low text-on-surface px-1.5 py-0.5 rounded-sm">
+                      {item.accessionNo || 'Chưa có ĐKCB'}
+                    </span>
+                    <span className="block font-label-sm text-label-sm text-outline mt-1">
+                      {item.callNumber || item.ddcMain || 'Chưa phân loại'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="flex flex-wrap items-center justify-between gap-space-xs mb-space-xs">
+                      <span className={`${statusClass} font-label-sm text-label-sm px-2 py-0.5 rounded-sm font-semibold flex items-center gap-1`}>
+                        <span className="material-symbols-outlined text-[14px]">{overdue ? 'warning' : 'timer'}</span>
+                        {item.statusLabel}
+                      </span>
+                      <span className="font-label-sm text-label-sm text-outline">
+                        Gia hạn lần {item.renewCount} / Tối đa {item.maxRenewals}
+                      </span>
+                    </div>
+                    <h3 className="font-headline-md text-headline-md text-on-surface leading-snug">{item.title}</h3>
+                    <p className="font-body-md text-body-md text-on-surface-variant mt-1">
+                      Tác giả: {item.author || 'Chưa cập nhật'}
+                      {item.publisher ? ` — ${item.publisher}` : ''}
+                      {item.publishYear ? ` (${item.publishYear})` : ''}
+                    </p>
+                    <p className="font-label-sm text-label-sm text-outline mt-1">
+                      Mã phiếu: <span className="font-code-md text-code-md text-on-surface">{item.loanCode || '—'}</span>
+                      {item.categoryName ? ` • ${item.categoryName}` : ''}
+                    </p>
+
+                    <div className="mt-space-md bg-surface-container-low p-space-md rounded-lg">
+                      <div className="flex justify-between items-center font-label-md text-label-md text-on-surface">
+                        <div className="flex flex-col">
+                          <span className="font-label-sm text-label-sm text-on-surface-variant">Ngày mượn</span>
+                          <span className="font-code-md text-code-md font-semibold">{fmtDate(item.loanedAt)}</span>
+                        </div>
+                        <div className="flex flex-col text-right">
+                          <span className={`font-label-sm text-label-sm font-semibold ${overdue ? 'text-error' : 'text-tertiary'}`}>Hạn trả hiện tại</span>
+                          <span className={`font-code-md text-code-md font-bold ${overdue ? 'text-error' : 'text-tertiary'}`}>{fmtDate(item.dueDate)}</span>
+                        </div>
+                      </div>
+                      <div className="mt-space-sm">
+                        <div className={`w-full ${overdue ? 'bg-error-container' : 'bg-surface-container-highest'} h-2 rounded-full overflow-hidden`}>
+                          <div className={`${overdue ? 'bg-error' : item.dueSoon ? 'bg-tertiary' : 'bg-primary'} h-full rounded-full transition-all duration-500`} style={{ width: `${item.progress}%` }} />
+                        </div>
+                        <div className="flex justify-between font-label-sm text-label-sm text-on-surface-variant mt-1">
+                          <span>Đã mượn {item.elapsedDays} ngày</span>
+                          <span className={overdue ? 'text-error font-semibold' : item.dueSoon ? 'text-tertiary font-semibold' : ''}>
+                            {overdue ? `Phạt tạm tính: ${money(item.fine)}` : `Chu kỳ ${item.cycleDays} ngày`}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-space-lg pt-space-md flex flex-wrap items-start gap-space-sm">
+                    <RenewButton item={item} busy={busyId === item.loanItemId} onRenew={renew} />
+                    {overdue && (
+                      <span className="font-label-sm text-label-sm text-error flex items-center gap-1 mt-2">
+                        <span className="material-symbols-outlined text-[16px]">info</span>
+                        Vui lòng mang sách đến quầy để trả và thanh toán phạt.
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      <div className="lg:col-span-4 flex flex-col gap-space-lg">
+        <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+          <div className="flex items-center gap-space-sm text-tertiary">
+            <span className="material-symbols-outlined text-[24px]">gavel</span>
+            <h3 className="font-headline-sm text-headline-sm text-on-surface">Quy định áp dụng cho hồ sơ</h3>
+          </div>
+          <div className="flex flex-col gap-space-md font-body-sm text-body-sm text-on-surface-variant">
+            <div className="flex items-start gap-space-sm">
+              <span className="w-6 h-6 rounded bg-surface-container flex items-center justify-center text-primary font-bold flex-shrink-0">1</span>
+              <div>
+                <strong className="text-on-surface block font-label-md text-label-md">Hạn mức &amp; thời hạn:</strong>
+                Mượn tối đa <strong>{type?.maxBooks ?? 0} cuốn</strong> cùng lúc, thời hạn <strong>{type?.loanDays ?? 0} ngày</strong> kể từ ngày mượn tại quầy.
+              </div>
+            </div>
+            <div className="flex items-start gap-space-sm">
+              <span className="w-6 h-6 rounded bg-surface-container flex items-center justify-center text-primary font-bold flex-shrink-0">2</span>
+              <div>
+                <strong className="text-on-surface block font-label-md text-label-md">Gia hạn trực tuyến:</strong>
+                Tối đa <strong>{type?.maxRenewals ?? 0} lần</strong>, mỗi lần <strong>+{type?.renewDays ?? 0} ngày</strong>. Chỉ áp dụng khi sách chưa quá hạn và thẻ còn hiệu lực.
+              </div>
+            </div>
+            <div className="flex items-start gap-space-sm">
+              <span className="w-6 h-6 rounded bg-surface-container flex items-center justify-center text-error font-bold flex-shrink-0">3</span>
+              <div>
+                <strong className="text-error block font-label-md text-label-md">Phạt quá hạn:</strong>
+                <strong>{money(settings?.finePerDay ?? 1000)} / ngày / cuốn</strong>, tính từ ngày kế tiếp của hạn trả. Thanh toán tại quầy thư viện.
+              </div>
+            </div>
+            <div className="flex items-start gap-space-sm">
+              <span className="w-6 h-6 rounded bg-surface-container flex items-center justify-center text-error font-bold flex-shrink-0">4</span>
+              <div>
+                <strong className="text-error block font-label-md text-label-md">Nhắc hạn &amp; khóa mượn:</strong>
+                Hệ thống nhắc trước <strong>{settings?.remindBeforeDays ?? 2} ngày</strong>. Giữ sách quá hạn trên <strong>{settings?.autoLockAfterDays ?? 30} ngày</strong> sẽ bị khóa quyền mượn mới.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-sm">
+          <div className="flex items-center gap-space-sm text-primary">
+            <span className="material-symbols-outlined text-[22px]">badge</span>
+            <h3 className="font-headline-sm text-headline-sm text-on-surface">Thẻ thư viện của bạn</h3>
+          </div>
+          <div className="flex justify-between font-body-sm text-body-sm">
+            <span className="text-on-surface-variant">Mã thẻ</span>
+            <span className="font-code-md text-code-md text-on-surface">{patron?.cardBarcode || '—'}</span>
+          </div>
+          <div className="flex justify-between font-body-sm text-body-sm">
+            <span className="text-on-surface-variant">Trạng thái</span>
+            <span className="font-label-md text-label-md font-semibold text-on-surface">{CARD_STATUS[patron?.cardStatus] || patron?.cardStatus || '—'}</span>
+          </div>
+          <div className="flex justify-between font-body-sm text-body-sm">
+            <span className="text-on-surface-variant">Hết hạn thẻ</span>
+            <span className="font-code-md text-code-md text-on-surface">{fmtDate(patron?.cardExpiresAt)}</span>
+          </div>
+          <div className="flex justify-between font-body-sm text-body-sm">
+            <span className="text-on-surface-variant">Loại độc giả</span>
+            <span className="font-label-md text-label-md text-on-surface">{type?.name || '—'}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

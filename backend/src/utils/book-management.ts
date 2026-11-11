@@ -96,3 +96,50 @@ export async function ensureLibrarianRole(strapi: Core.Strapi) {
     }
   });
 }
+
+// Các action nghiệp vụ quầy chỉ dành cho thủ thư, không cấp cho tài khoản độc giả.
+const STAFF_ONLY_ACTIONS = [
+  "api::patron.patron.lookup",
+  "api::loan.loan.checkout",
+  "api::loan.loan.returnBook",
+  "api::loan.loan.shiftHistory",
+  "api::loan-item.loan-item.byPatron",
+  "api::loan-item.loan-item.renew",
+  "api::loan-item.loan-item.bulkRenew",
+  "api::return-receipt.return-receipt.shiftHistory",
+];
+
+const READER_ACTIONS = [
+  "plugin::users-permissions.user.me",
+  "api::loan-item.loan-item.meCurrent",
+  "api::loan-item.loan-item.meHistory",
+  "api::loan-item.loan-item.renewMine",
+];
+
+/** Cấp quyền API cá nhân cho độc giả và thu hồi quyền nghiệp vụ quầy khỏi vai trò không phải thủ thư. */
+export async function ensureReaderPermissions(strapi: Core.Strapi) {
+  await strapi.db.transaction(async () => {
+    const roles = strapi.db.query("plugin::users-permissions.role");
+    const permissions = strapi.db.query("plugin::users-permissions.permission");
+    const allRoles = await roles.findMany({ limit: 100 });
+
+    const readerRoles = allRoles.filter((role: any) => ["authenticated", "reader"].includes(role.type));
+    for (const role of readerRoles) {
+      for (const action of READER_ACTIONS) {
+        if (!(await permissions.findOne({ where: { action, role: { id: role.id } } }))) {
+          await permissions.create({ data: { action, role: role.id } });
+        }
+      }
+    }
+
+    for (const role of allRoles) {
+      if (role.type === "librarian") continue;
+      const unwanted = await permissions.findMany({
+        where: { action: { $in: STAFF_ONLY_ACTIONS }, role: { id: role.id } },
+      });
+      for (const permission of unwanted) {
+        await permissions.delete({ where: { id: permission.id } });
+      }
+    }
+  });
+}

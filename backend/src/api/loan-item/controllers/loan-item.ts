@@ -96,5 +96,26 @@ Trân trọng!`,
       };
     },
 
+    // 5. API cá nhân: sách đang mượn của tài khoản đang đăng nhập
+    async meCurrent(ctx) {
+      ctx.body = await strapi
+        .service("api::loan-item.loan-item")
+        .currentForUser(ctx.state.user);
+    },
+
+    // 6. API cá nhân: lịch sử mượn của tài khoản đang đăng nhập
+    async meHistory(ctx) {
+      ctx.body = await strapi
+        .service("api::loan-item.loan-item")
+        .historyForUser(ctx.state.user, ctx.query);
+    },
+
+    // 7. API cá nhân: gia hạn lượt mượn thuộc tài khoản đang đăng nhập
+    async renewMine(ctx) {
+      ctx.body = await strapi
+        .service("api::loan-item.loan-item")
+        .renew(ctx.params.documentId, ctx.state.user);
+    },
+
   })
 );

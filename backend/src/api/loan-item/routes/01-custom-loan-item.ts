@@ -1,5 +1,33 @@
 export default {
   routes: [
+    // API cá nhân: độc giả đang đăng nhập chỉ thao tác trên hồ sơ Patron gắn với tài khoản.
+    {
+      method: "GET",
+      path: "/loan-items/me/current",
+      handler: "loan-item.meCurrent",
+      config: {
+        auth: {},
+        policies: [],
+      },
+    },
+    {
+      method: "GET",
+      path: "/loan-items/me/history",
+      handler: "loan-item.meHistory",
+      config: {
+        auth: {},
+        policies: [],
+      },
+    },
+    {
+      method: "POST",
+      path: "/loan-items/me/:documentId/renew",
+      handler: "loan-item.renewMine",
+      config: {
+        auth: {},
+        policies: [],
+      },
+    },
     {
       method: "GET",
       path: "/loan-items/by-patron",
