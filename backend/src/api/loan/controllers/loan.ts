@@ -1,4 +1,5 @@
 import { factories } from "@strapi/strapi";
+import { todayStr } from "../../../utils/library";
 
 export default factories.createCoreController("api::loan.loan", ({ strapi }) => ({
   // ==========================================
@@ -10,7 +11,7 @@ export default factories.createCoreController("api::loan.loan", ({ strapi }) => 
       patronBarcode,
       copyBarcodes,
       sendEmailReceipt: !!sendEmailReceipt,
-      librarianId: ctx.state.user?.documentId,
+      librarianId: ctx.state.user?.id,
     });
   },
 
@@ -21,7 +22,7 @@ export default factories.createCoreController("api::loan.loan", ({ strapi }) => 
       copyBarcode,
       returnCondition: returnCondition || "normal",
       fineCollected: !!fineCollected,
-      librarianId: ctx.state.user?.documentId,
+      librarianId: ctx.state.user?.id,
     });
   },
 
@@ -30,7 +31,7 @@ export default factories.createCoreController("api::loan.loan", ({ strapi }) => 
     ctx.body = await strapi.service("api::loan.loan").shiftHistory({
       from,
       to,
-      librarianId: mine === "true" ? ctx.state.user?.documentId : undefined,
+      librarianId: mine === "true" ? ctx.state.user?.id : undefined,
     });
   },
 
@@ -43,21 +44,18 @@ export default factories.createCoreController("api::loan.loan", ({ strapi }) => 
    * Đếm số lượng theo tab (all, borrowing, overdue, renewed2plus, returned)
    */
   async getStatusCounts(ctx) {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayStr();
 
     const [all, borrowing, overdue, renewed2plus, returned] = await Promise.all([
       strapi.db.query("api::loan.loan").count(),
-      strapi.db.query("api::loan-item.loan-item").count({
-        where: { returnedAt: { $null: true } },
+      strapi.db.query("api::loan.loan").count({
+        where: { loanItems: { status: { $in: ["borrowing", "overdue"] } } },
       }),
-      strapi.db.query("api::loan-item.loan-item").count({
-        where: {
-          returnedAt: { $null: true },
-          dueDate: { $lt: today },
-        },
+      strapi.db.query("api::loan.loan").count({
+        where: { loanItems: { status: { $in: ["borrowing", "overdue"] }, dueDate: { $lt: today } } },
       }),
-      strapi.db.query("api::loan-item.loan-item").count({
-        where: { renewCount: { $gte: 2 } },
+      strapi.db.query("api::loan.loan").count({
+        where: { loanItems: { renewCount: { $gte: 2 } } },
       }),
       strapi.db.query("api::loan.loan").count({
         where: { status: "returned" },
@@ -79,61 +77,45 @@ export default factories.createCoreController("api::loan.loan", ({ strapi }) => 
    */
   async getAdminList(ctx) {
     const { status, q, page = 1, pageSize = 10, className, from, to, ids } = ctx.query as any;
-    const currentPage = Math.max(1, Number(page) || 1);
-    const size = Math.min(100, Math.max(1, Number(pageSize) || 10));
-    const keyword = String(q || "").trim().toLowerCase();
-
-    // Quan hệ đúng theo schema.json là loanItems (không phải items).
-    // Lấy dữ liệu liên quan trước, sau đó lọc để hỗ trợ trạng thái quá hạn/gia hạn
-    // vốn được xác định ở cấp loan-item.
-    const loans = await strapi.db.query("api::loan.loan").findMany({
+    const requestedPage = Math.max(1, Number.parseInt(page, 10) || 1);
+    const size = Math.min(100, Math.max(1, Number.parseInt(pageSize, 10) || 10));
+    const keyword = String(q || "").trim();
+    const today = todayStr();
+    const clauses: any[] = [];
+    const activeItems = { status: { $in: ["borrowing", "overdue"] } };
+    if (status === "borrowing") clauses.push({ loanItems: activeItems });
+    if (status === "overdue") clauses.push({ loanItems: { ...activeItems, dueDate: { $lt: today } } });
+    if (status === "returned") clauses.push({ status: "returned" });
+    if (status === "renewed2plus") clauses.push({ loanItems: { renewCount: { $gte: 2 } } });
+    if (status === "renewed") clauses.push({ loanItems: { renewCount: { $gt: 0 } } });
+    if (ids) clauses.push({ documentId: { $in: String(ids).split(",").filter(Boolean).slice(0, 100) } });
+    if (className) clauses.push({ patron: { className: { $containsi: String(className).trim() } } });
+    if (/^\d{4}-\d{2}-\d{2}$/.test(String(from || ""))) clauses.push({ loanedAt: { $gte: `${from}T00:00:00+07:00` } });
+    if (/^\d{4}-\d{2}-\d{2}$/.test(String(to || ""))) clauses.push({ loanedAt: { $lte: `${to}T23:59:59.999+07:00` } });
+    if (keyword) clauses.push({ $or: [
+      { code: { $containsi: keyword } },
+      { patron: { fullName: { $containsi: keyword } } },
+      { patron: { studentCode: { $containsi: keyword } } },
+      { patron: { cardBarcode: { $containsi: keyword } } },
+      { loanItems: { copy: { book: { title: { $containsi: keyword } } } } },
+      { loanItems: { copy: { accessionNo: { $containsi: keyword } } } },
+    ] });
+    const where = clauses.length ? { $and: clauses } : {};
+    const repository = strapi.db.query("api::loan.loan");
+    const total = await repository.count({ where });
+    const pageCount = Math.max(1, Math.ceil(total / size));
+    const currentPage = Math.min(requestedPage, pageCount);
+    const loans = await repository.findMany({
+      where,
       populate: {
         patron: { populate: { patronType: true } },
         loanItems: { populate: { copy: { populate: { book: true } } } },
         librarian: true,
       },
-      orderBy: { loanedAt: "desc" },
-      limit: 10000,
+      orderBy: [{ loanedAt: "desc" }, { id: "desc" }],
+      offset: (currentPage - 1) * size, limit: size,
     });
-
-    const today = new Date().toISOString().slice(0, 10);
-    const selectedIds = ids ? String(ids).split(",").filter(Boolean) : null;
-    const filtered = loans.filter((loan: any) => {
-      if (selectedIds && !selectedIds.includes(String(loan.documentId))) return false;
-      const items = loan.loanItems || [];
-      const hasOverdue = items.some((item: any) =>
-        !item.returnedAt && item.status !== "returned" && item.dueDate < today
-      );
-      const hasRenewed = items.some((item: any) => Number(item.renewCount || 0) > 0);
-      const loanDate = String(loan.loanedAt || loan.createdAt || "").slice(0, 10);
-      if (from && loanDate < String(from)) return false;
-      if (to && loanDate > String(to)) return false;
-      if (className) {
-        const cls = String(loan.patron?.className || "").toLowerCase();
-        const typeName = String(loan.patron?.patronType?.name || "").toLowerCase();
-        if (className === "teachers") {
-          if (!/(gi[aá]o vi[eê]n|c[aá]n b[oộ]|teacher|staff)/i.test(typeName)) return false;
-        } else {
-          const grade = String(className).replace("k", "");
-          if (!cls.includes(grade)) return false;
-        }
-      }
-      if (status === "borrowing" && loan.status !== "borrowing") return false;
-      if (status === "returned" && loan.status !== "returned") return false;
-      if (status === "overdue" && !hasOverdue) return false;
-      if (status === "renewed2plus" && !items.some((i: any) => Number(i.renewCount || 0) >= 2)) return false;
-      if (status === "renewed" && !hasRenewed) return false;
-      if (keyword) {
-        const haystack = [loan.code, loan.patron?.fullName, loan.patron?.studentCode,
-          loan.patron?.cardBarcode, ...items.map((i: any) => i.copy?.book?.title),
-          ...items.map((i: any) => i.copy?.accessionNo)].join(" ").toLowerCase();
-        if (!haystack.includes(keyword)) return false;
-      }
-      return true;
-    });
-
-    const total = filtered.length;
-    const data = filtered.slice((currentPage - 1) * size, currentPage * size).map((loan: any) => {
+    const data = loans.map((loan: any) => {
       const items = (loan.loanItems || []).map((item: any) => ({
         loanItemId: item.documentId,
         bookTitle: item.copy?.book?.title || "",
@@ -157,12 +139,12 @@ export default factories.createCoreController("api::loan.loan", ({ strapi }) => 
         loanedAt: loan.loanedAt || loan.createdAt,
         librarian: loan.librarian?.username || null,
         totalFine: items.reduce((sum: number, item: any) => sum + item.fine, 0),
-        status: loan.status,
+        status: items.every((item: any) => item.status === "returned") ? "returned" : items.some((item: any) => item.status !== "returned" && item.dueDate < today) ? "overdue" : "borrowing",
       };
     });
 
     ctx.body = { data, meta: { pagination: {
-      page: currentPage, pageSize: size, total, pageCount: Math.ceil(total / size),
+      page: currentPage, pageSize: size, total, pageCount,
     } } };
   },
 
@@ -174,7 +156,7 @@ export default factories.createCoreController("api::loan.loan", ({ strapi }) => 
     const { documentId } = ctx.params;
 
     const loan = await strapi.db.query("api::loan.loan").findOne({
-      where: { $or: [{ documentId }, { id: documentId }] },
+      where: { documentId },
       populate: ["patron", "loanItems.copy.book", "librarian"],
     });
 

@@ -34,7 +34,7 @@ export default {
       handler: "loan-item.byPatron",
       config: {
         auth: {},
-        policies: [],
+        policies: ["global::is-library-staff"],
       },
     },
     {
@@ -43,7 +43,7 @@ export default {
       handler: "loan-item.bulkRenew",
       config: {
         auth: {},
-        policies: [],
+        policies: ["global::is-library-staff"],
       },
     },
     {
@@ -52,7 +52,7 @@ export default {
       handler: "loan-item.renew",
       config: {
         auth: {},
-        policies: [],
+        policies: ["global::is-library-staff"],
       },
     },
     {
@@ -61,7 +61,7 @@ export default {
       handler: "loan-item.remindNotification",
       config: {
         auth: {},
-        policies: [],
+        policies: ["global::is-library-staff"],
         middlewares: [],
       },
     },

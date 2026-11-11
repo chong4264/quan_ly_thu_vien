@@ -1,5 +1,6 @@
 import { factories } from "@strapi/strapi";
 import type { Core } from "@strapi/strapi";
+import { lockDocument } from "../../../utils/circulation-locks";
 import {
   ACTIVE, ApplicationError, ForbiddenError, NotFoundError, UID, UnauthorizedError,
   addDays, compensationTable, daysBetween, docs, getSettings, lateDays, todayStr,
@@ -410,16 +411,13 @@ export default factories.createCoreService("api::loan-item.loan-item", ({ strapi
   // currentUser chỉ được truyền từ API cá nhân; khi đó bắt buộc kiểm tra quyền sở hữu.
   async renew(documentId: string, currentUser?: any) {
     return strapi.db.transaction(async ({ trx }) => {
-      // Khóa dòng sách (bỏ qua SQLite vì SQLite không hỗ trợ SELECT ... FOR UPDATE).
-      const meta = strapi.db.metadata.get(UID.loanItem);
-      const documentColumn = (meta.attributes.documentId as any)?.columnName ?? "document_id";
-      const client = String((strapi.db.connection as any)?.client?.config?.client ?? "");
-      if (client !== "sqlite") {
-        await strapi.db.connection(meta.tableName)
-          .where(documentColumn, documentId)
-          .transacting(trx)
-          .forUpdate();
-      }
+      const candidate = await docs(strapi, UID.loanItem).findOne({
+        documentId, populate: { loan: { populate: { patron: true } } },
+      });
+      if (!candidate) throw new NotFoundError("Không tìm thấy lượt mượn");
+      if (!candidate.loan?.patron) throw new ApplicationError("Thiếu thông tin độc giả");
+      await lockDocument(strapi, UID.patron, candidate.loan.patron.documentId, trx);
+      await lockDocument(strapi, UID.loanItem, documentId, trx);
 
       const item = await docs(strapi, UID.loanItem).findOne({
         documentId,
@@ -450,6 +448,8 @@ export default factories.createCoreService("api::loan-item.loan-item", ({ strapi
       const renewCount = Number(item.renewCount ?? 0);
       const maxRenewals = Number(type.maxRenewals ?? 0);
       if (renewCount >= maxRenewals) throw new ApplicationError(`Đã gia hạn tối đa ${maxRenewals} lần`);
+      if (!Number.isInteger(Number(type.renewDays)) || Number(type.renewDays) <= 0)
+        throw new ApplicationError("Nhóm độc giả chưa có số ngày gia hạn hợp lệ");
 
       const newDueDate = addDays(item.dueDate, Number(type.renewDays ?? 0));
       await docs(strapi, UID.loanItem).update({

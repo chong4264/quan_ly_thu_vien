@@ -1,7 +1,60 @@
+import { Link } from 'react-router-dom';
 import NavItem from '../common/NavItem';
+import UniversityBrand from '../common/UniversityBrand';
+import LogoutButton from '../common/LogoutButton';
+import { useAuth } from '../../context/auth';
+import { displayName, roleName } from '../../lib/user-profile';
+
+const groups = [
+  ['Tổng quan', [['dashboard-tong-quan', 'dashboard', 'Dashboard tổng quan']]],
+  ['Nghiệp vụ lưu thông', [
+    ['quay-muon-sach', 'output', 'Quầy mượn sách'],
+    ['quay-tra-gia-han', 'input', 'Quầy trả & Gia hạn'],
+    ['phieu-muon-tra', 'receipt_long', 'Phiếu mượn trả'],
+    ['quan-ly-yeu-cau-muon', 'online_prediction', 'Yêu cầu mượn online'],
+  ]],
+  ['Biên mục & Tài liệu', [
+    ['quan-ly-dau-sach', 'menu_book', 'Quản lý đầu sách'],
+    ['them-moi-sua-sach', 'add_circle', 'Thêm mới / Sửa sách'],
+    ['quan-ly-ban-sao', 'layers', 'Quản lý bản sao'],
+    ['quan-ly-the-loai', 'category', 'Quản lý thể loại'],
+  ]],
+  ['Độc giả & Thống kê', [
+    ['quan-ly-doc-gia', 'badge', 'Quản lý độc giả'],
+    ['bao-cao-thong-ke', 'bar_chart', 'Báo cáo thống kê'],
+    ['cau-hinh-he-thong', 'settings', 'Cấu hình hệ thống'],
+  ]],
+];
 
 export default function Sidebar() {
+  const { user } = useAuth();
   return (
-    <aside className="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest border-r border-surface-container z-50 flex flex-col"><div className="h-16 px-space-md border-b border-surface-container flex items-center justify-between"><div className="flex items-center gap-space-sm"><div className="w-8 h-8 bg-primary-container text-on-primary rounded-lg flex items-center justify-center font-headline-sm text-headline-sm font-bold shadow-sm"><span className="material-symbols-outlined text-[18px]">school</span></div><div><span className="block font-headline-sm text-headline-sm font-bold text-on-surface leading-tight">EduLib</span><span className="block font-label-sm text-label-sm text-on-surface-variant">Phân hệ Thủ thư</span></div></div><span className="font-code-md text-code-md text-primary font-bold bg-surface-container-low px-1.5 py-0.5 rounded-sm border border-surface-container">ADMIN</span></div><div className="px-space-md py-space-sm border-b border-surface-container bg-surface-container-low"><div className="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm font-semibold uppercase tracking-wider"><span>Quét nhanh mã vạch</span><span className="material-symbols-outlined text-[16px]">barcode_scanner</span></div><div className="mt-1 flex items-center bg-surface-container-lowest border border-surface-container rounded-sm px-2 py-1"><span className="font-code-md text-code-md text-outline mr-1">#</span><input className="w-full bg-transparent font-code-md text-code-md text-on-surface placeholder-outline focus:outline-none" placeholder="Mã thẻ độc giả / sách..." type="text" /></div></div><div className="flex-1 overflow-y-auto py-space-sm"><nav className="px-space-sm space-y-0.5" data-active-classes="bg-primary-container text-on-primary font-semibold rounded-sm"><div className="px-space-sm pt-2 pb-1 font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold">Tổng quan</div><NavItem to="dashboard-tong-quan" active="bg-primary-container text-on-primary font-semibold rounded-sm" className="flex items-center gap-space-sm px-space-sm py-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-sm transition-colors"><span className="material-symbols-outlined text-[18px]">dashboard</span><span className="font-label-md text-label-md">Dashboard tổng quan</span></NavItem><div className="px-space-sm pt-3 pb-1 font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold">Nghiệp vụ lưu thông</div><NavItem to="quay-muon-sach" active="bg-primary-container text-on-primary font-semibold rounded-sm" className="flex items-center gap-space-sm px-space-sm py-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-sm transition-colors"><span className="material-symbols-outlined text-[18px]">output</span><span className="font-label-md text-label-md">Quầy mượn sách</span></NavItem><NavItem to="quay-tra-gia-han" active="bg-primary-container text-on-primary font-semibold rounded-sm" className="flex items-center gap-space-sm px-space-sm py-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-sm transition-colors"><span className="material-symbols-outlined text-[18px]">input</span><span className="font-label-md text-label-md">Quầy trả & Gia hạn</span></NavItem><NavItem to="phieu-muon-tra" active="bg-primary-container text-on-primary font-semibold rounded-sm" className="flex items-center gap-space-sm px-space-sm py-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-sm transition-colors"><span className="material-symbols-outlined text-[18px]">receipt_long</span><span className="font-label-md text-label-md">Phiếu mượn trả</span></NavItem><div className="px-space-sm pt-3 pb-1 font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold">Biên mục & Tài liệu</div><NavItem to="quan-ly-dau-sach" active="bg-primary-container text-on-primary font-semibold rounded-sm" className="flex items-center gap-space-sm px-space-sm py-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-sm transition-colors"><span className="material-symbols-outlined text-[18px]">menu_book</span><span className="font-label-md text-label-md">Quản lý đầu sách</span></NavItem><NavItem to="them-moi-sua-sach" active="bg-primary-container text-on-primary font-semibold rounded-sm" className="flex items-center gap-space-sm px-space-sm py-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-sm transition-colors"><span className="material-symbols-outlined text-[18px]">add_circle</span><span className="font-label-md text-label-md">Thêm mới / Sửa sách</span></NavItem><NavItem to="quan-ly-ban-sao" active="bg-primary-container text-on-primary font-semibold rounded-sm" className="flex items-center gap-space-sm px-space-sm py-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-sm transition-colors"><span className="material-symbols-outlined text-[18px]">layers</span><span className="font-label-md text-label-md">Quản lý bản sao</span></NavItem><NavItem to="quan-ly-the-loai" active="bg-primary-container text-on-primary font-semibold rounded-sm" className="flex items-center gap-space-sm px-space-sm py-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-sm transition-colors"><span className="material-symbols-outlined text-[18px]">category</span><span className="font-label-md text-label-md">Quản lý thể loại</span></NavItem><div className="px-space-sm pt-3 pb-1 font-label-sm text-label-sm uppercase tracking-wider text-outline font-bold">Độc giả & Thống kê</div><NavItem to="quan-ly-doc-gia" active="bg-primary-container text-on-primary font-semibold rounded-sm" className="flex items-center gap-space-sm px-space-sm py-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-sm transition-colors"><span className="material-symbols-outlined text-[18px]">badge</span><span className="font-label-md text-label-md">Quản lý độc giả</span></NavItem><NavItem to="bao-cao-thong-ke" active="bg-primary-container text-on-primary font-semibold rounded-sm" className="flex items-center gap-space-sm px-space-sm py-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-sm transition-colors"><span className="material-symbols-outlined text-[18px]">bar_chart</span><span className="font-label-md text-label-md">Báo cáo thống kê</span></NavItem><NavItem to="cau-hinh-he-thong" active="bg-primary-container text-on-primary font-semibold rounded-sm" className="flex items-center gap-space-sm px-space-sm py-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-sm transition-colors"><span className="material-symbols-outlined text-[18px]">settings</span><span className="font-label-md text-label-md">Cấu hình hệ thống</span></NavItem></nav></div><div className="p-space-md border-t border-surface-container bg-surface-container-low"><div className="flex items-center justify-between"><div className="flex items-center gap-space-sm"><div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span className="material-symbols-outlined text-on-primary text-[18px]">person</span></div><div><div className="font-label-md text-label-md font-semibold text-on-surface leading-tight">Nguyễn Văn An</div><div className="font-label-sm text-label-sm text-on-surface-variant">Thủ thư trưởng</div></div></div><button className="p-1 text-on-surface-variant hover:text-error rounded-sm transition-colors" title="Đăng xuất" onClick={()=>toast("Đăng xuất")}><span className="material-symbols-outlined text-[20px]">logout</span></button></div></div></aside>
+    <aside className="fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-surface-container bg-surface-container-lowest">
+      <Link to="/dashboard-tong-quan" className="flex h-20 shrink-0 items-center border-b border-surface-container px-4">
+        <UniversityBrand compact />
+      </Link>
+      <div className="flex-1 overflow-y-auto p-3">
+        <nav aria-label="Điều hướng thủ thư" className="space-y-4">
+          {groups.map(([title, links]) => (
+            <div key={title}>
+              <p className="mb-1 px-2 text-xs font-bold uppercase tracking-wide text-outline">{title}</p>
+              {links.map(([to, icon, label]) => (
+                <NavItem key={to} to={to} active="bg-primary-container text-on-primary font-semibold"
+                  className="flex items-center gap-2 rounded-sm px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-container">
+                  <span className="material-symbols-outlined text-[20px]" aria-hidden="true">{icon}</span>{label}
+                </NavItem>
+              ))}
+            </div>
+          ))}
+        </nav>
+      </div>
+      <div className="flex items-center justify-between gap-2 border-t border-surface-container bg-surface-container-low p-4">
+        <Link to="/ho-so-ca-nhan" className="min-w-0 text-sm hover:text-primary" aria-label="Hồ sơ cá nhân">
+          <p className="truncate font-semibold">{displayName(user)}</p>
+          <p className="mt-1 text-xs text-on-surface-variant">{roleName(user)}</p>
+        </Link>
+        <LogoutButton compact />
+      </div>
+    </aside>
   );
 }

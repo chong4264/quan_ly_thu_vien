@@ -2,6 +2,9 @@ import type { Core } from "@strapi/strapi";
 
 /** Các API tra cứu sách dành cho mọi tài khoản đã đăng nhập */
 export const READER_ACTIONS = [
+  "plugin::users-permissions.auth.logout",
+  "api::patron.patron.getMe",
+  "api::patron.patron.updateMe",
   "api::book.book.search",
   "api::book.book.newArrivals",
   "api::book.book.facets",

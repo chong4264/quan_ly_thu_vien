@@ -1,0 +1,16 @@
+{
+  "kind": "collectionType",
+  "collectionName": "loan_requests",
+  "info": { "singularName": "loan-request", "pluralName": "loan-requests", "displayName": "Yêu cầu mượn online" },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "status": { "type": "enumeration", "enum": ["pending", "fulfilled", "rejected", "cancelled"], "default": "pending", "required": true },
+    "note": { "type": "text", "maxLength": 500 },
+    "responseNote": { "type": "text", "maxLength": 500 },
+    "processedAt": { "type": "datetime" },
+    "patron": { "type": "relation", "relation": "manyToOne", "target": "api::patron.patron", "required": true },
+    "book": { "type": "relation", "relation": "manyToOne", "target": "api::book.book", "required": true },
+    "loan": { "type": "relation", "relation": "manyToOne", "target": "api::loan.loan" },
+    "processedBy": { "type": "relation", "relation": "manyToOne", "target": "plugin::users-permissions.user" }
+  }
+}

@@ -1,6 +1,7 @@
 import { useToast } from '../../../context/ToastContext';
 import { coverUrl } from '../../../lib/api';
 import { CIRCULATION, COPY_CONDITION, LANGUAGE, fmtDate } from '../../../lib/format';
+import RequestButton from '../YeuCauMuon/RequestButton';
 
 const STATUS_CHIP = {
   available: 'bg-secondary-fixed text-on-secondary-fixed',
@@ -21,7 +22,6 @@ const Field = ({ label, children, code, accent }) => (
 export default function DaiSoTuyenTinh({ book }) {
   const toast = useToast();
   const img = coverUrl(book.cover);
-  const authors = [book.author, book.coAuthors].filter(Boolean).join(', ');
   const loc = book.location;
   const restricted = book.referenceOnly || !book.allowHomeLoan;
 
@@ -87,6 +87,7 @@ export default function DaiSoTuyenTinh({ book }) {
           </div>
 
           <div className="w-full mt-space-md flex flex-col gap-space-sm">
+            <RequestButton key={book.documentId} book={book} />
             <button
               className="w-full h-10 bg-primary-container hover:bg-primary text-on-primary rounded-sm font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 shadow-sm transition-all focus:ring-2 focus:ring-primary focus:outline-none"
               onClick={() => copyText(book.callNumber || book.isbn, `Đã sao chép ký hiệu: ${book.callNumber || book.isbn}`)}

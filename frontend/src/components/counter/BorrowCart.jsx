@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useRef, useState } from 'react';
 import { api, qs } from '../../lib/api';
 import { useToast } from '../../context/ToastContext';
 import { addDaysFromToday, fmtDate } from '../../lib/format';
@@ -10,26 +10,29 @@ export default function BorrowCart({ patron, onDone }) {
   const [email, setEmail] = useState(false);
   const [busy, setBusy] = useState(false);
   const [receipt, setReceipt] = useState(null);
-
-  useEffect(() => { setCart([]); setReceipt(null); }, [patron?.documentId]);
+  const submission = useRef(false);
+  const scanPending = useRef(false);
 
   const add = async () => {
     const v = code.trim();
-    if (!v) return;
+    if (!v || submission.current || scanPending.current) return;
     if (!patron) return toast('Hãy xác thực độc giả trước');
     if (!patron.canBorrow) return toast(patron.blockReason);
+    scanPending.current = true;
     try {
       const c = await api(`/copies/lookup?${qs({ barcode: v })}`);
       if (!c.canBorrow) return toast(`${c.accessionNo}: ${c.blockReason}`);
       if (cart.some((x) => x.accessionNo === c.accessionNo)) return toast('Sách này đã có trong giỏ');
       if (cart.length >= patron.remaining) return toast(`Chỉ được mượn thêm ${patron.remaining} cuốn`);
-      setCart([...cart, c]);
+      setCart((current) => current.some((copy) => copy.documentId === c.documentId) ? current : [...current, c]);
       setCode('');
       setReceipt(null);
-    } catch (e) { toast(e.message); }
+    } catch (e) { toast(e.message); } finally { scanPending.current = false; }
   };
 
   const confirm = async () => {
+    if (submission.current || scanPending.current || !patron || !cart.length) return;
+    submission.current = true;
     setBusy(true);
     try {
       const r = await api('/loans/checkout', {
@@ -40,7 +43,7 @@ export default function BorrowCart({ patron, onDone }) {
       setCart([]);
       toast(`Đã tạo phiếu ${r.loan.code}`);
       onDone();
-    } catch (e) { toast(e.message); } finally { setBusy(false); }
+    } catch (e) { toast(e.message); } finally { submission.current = false; setBusy(false); }
   };
 
   const due = patron?.patronType ? fmtDate(addDaysFromToday(patron.patronType.loanDays)) : '—';
@@ -53,7 +56,7 @@ export default function BorrowCart({ patron, onDone }) {
       </div>
       <div className="relative">
         <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-[18px]">qr_code_scanner</span>
-        <input value={code} onChange={(e) => setCode(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()} disabled={!patron}
+        <input value={code} onChange={(e) => setCode(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()} disabled={!patron || busy}
           placeholder={patron ? 'Quét mã vạch sách, rồi nhấn Enter...' : 'Quét thẻ độc giả trước'}
           className="w-full h-9 pl-9 pr-3 bg-surface-container-low font-code-md text-code-md rounded-sm focus:outline-none focus:ring-1 focus:ring-primary-container disabled:opacity-50" />
       </div>
@@ -69,7 +72,7 @@ export default function BorrowCart({ patron, onDone }) {
                 <div className="font-label-sm text-label-sm text-outline">{c.accessionNo} • {c.shelf?.code} • Hạn trả {due}</div>
               </div>
             </div>
-            <button onClick={() => setCart(cart.filter((x) => x !== c))} className="text-outline hover:text-error">
+            <button disabled={busy} onClick={() => setCart((current) => current.filter((x) => x.documentId !== c.documentId))} className="text-outline hover:text-error disabled:opacity-50" aria-label={`Bỏ ${c.book?.title} khỏi giỏ`}>
               <span className="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>

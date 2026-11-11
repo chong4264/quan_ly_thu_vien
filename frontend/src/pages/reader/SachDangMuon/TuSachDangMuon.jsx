@@ -16,7 +16,7 @@ export default function TuSachDangMuon({ payload, loading }) {
             <span className="material-symbols-outlined text-[18px]">collections_bookmark</span>
             <span>HỆ THỐNG MƯỢN TRẢ THƯ VIỆN SỐ</span>
             <span className="text-outline">/</span>
-            <span className="text-on-surface-variant">THPT Chuyên Chu Văn An</span>
+            <span className="text-on-surface-variant">Đại học Công nghiệp Hà Nội</span>
           </div>
           <h1 className="font-headline-xl text-headline-xl text-on-surface tracking-tight mt-space-xs">
             Tủ sách đang mượn &amp; Gia hạn trực tuyến

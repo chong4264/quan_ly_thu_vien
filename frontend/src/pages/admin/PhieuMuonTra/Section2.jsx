@@ -7,10 +7,14 @@ export default function Section2() {
   const [counts, setCounts] = useState({ all: 0, borrowing: 0, overdue: 0, renewed2plus: 0, returned: 0 });
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    api('/loans/status-counts')
-      .then((data) => setCounts(data || {}))
-      .catch((e) => toast(e.message || 'Không tải được thống kê phiếu mượn'))
-      .finally(() => setLoading(false));
+    let active = true;
+    const load = () => api('/loans/status-counts')
+      .then((data) => { if (active) setCounts(data || {}); })
+      .catch((e) => { if (active) toast(e.message || 'Không tải được thống kê phiếu mượn'); })
+      .finally(() => { if (active) setLoading(false); });
+    load();
+    window.addEventListener('loan-list:refresh', load);
+    return () => { active = false; window.removeEventListener('loan-list:refresh', load); };
   }, [toast]);
   const cards = [
     ['Tổng số phiếu mượn', counts.all, 'auto_stories'],

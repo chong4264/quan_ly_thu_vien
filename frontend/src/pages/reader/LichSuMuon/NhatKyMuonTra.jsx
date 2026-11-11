@@ -10,7 +10,7 @@ export default function NhatKyMuonTra({ payload, loading }) {
       <div className="flex items-center gap-space-xs text-on-surface-variant font-label-md text-label-md">
         <Link to="/tra-cuu-sach" className="hover:text-primary-container transition-colors flex items-center gap-1">
           <span className="material-symbols-outlined text-[16px]">school</span>
-          Cổng Học sinh
+          Cổng Sinh viên
         </Link>
         <span className="material-symbols-outlined text-[14px] text-outline">chevron_right</span>
         <span className="text-on-surface font-semibold">Lịch sử mượn trả tài liệu</span>
@@ -25,7 +25,7 @@ export default function NhatKyMuonTra({ payload, loading }) {
             {loading && !payload
               ? 'Đang tải lịch sử mượn tài liệu…'
               : linked
-                ? <>Tổng hợp toàn bộ <strong className="text-on-surface">{stats?.total ?? 0}</strong> giao dịch mượn tài liệu của học sinh <strong className="text-on-surface">{patron.fullName}</strong> ({patron.className}).</>
+                ? <>Tổng hợp toàn bộ <strong className="text-on-surface">{stats?.total ?? 0}</strong> giao dịch mượn tài liệu của sinh viên <strong className="text-on-surface">{patron.fullName}</strong> ({patron.className}).</>
                 : linked === false
                   ? 'Chưa thể hiển thị lịch sử vì tài khoản chưa được liên kết hồ sơ độc giả.'
                   : 'Tổng hợp toàn bộ giao dịch mượn tài liệu của tài khoản đang đăng nhập.'}

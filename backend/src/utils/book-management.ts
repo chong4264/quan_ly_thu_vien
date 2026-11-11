@@ -53,6 +53,11 @@ export function registerBookManagement(strapi: Core.Strapi) {
           "Đầu sách đang có bản sao. Hãy xử lý bản sao trước hoặc chuyển trạng thái đầu sách sang Ngừng lưu hành.",
         );
       }
+      if (await strapi.db.query("api::loan-request.loan-request" as any).count({
+        where: { book: { documentId } },
+      })) {
+        throw new errors.ApplicationError("Đầu sách đã có lịch sử yêu cầu mượn. Hãy chuyển sang Ngừng lưu hành để giữ lịch sử.");
+      }
       return next();
     });
   });
@@ -79,6 +84,7 @@ export async function ensureLibrarianRole(strapi: Core.Strapi) {
       "api::loan.loan.checkout", "api::loan.loan.returnBook", "api::loan.loan.shiftHistory",
       "api::loan-item.loan-item.byPatron", "api::loan-item.loan-item.renew", "api::loan-item.loan-item.bulkRenew",
       "api::return-receipt.return-receipt.shiftHistory",
+      ...STAFF_MANAGEMENT_ACTIONS,
     ];
     const permissions = strapi.db.query("plugin::users-permissions.permission");
     for (const action of actions) {
@@ -98,7 +104,17 @@ export async function ensureLibrarianRole(strapi: Core.Strapi) {
 }
 
 // Các action nghiệp vụ quầy chỉ dành cho thủ thư, không cấp cho tài khoản độc giả.
+const STAFF_MANAGEMENT_ACTIONS = [
+  ...["staffList", "staffFind", "staffCreate", "staffUpdate", "staffDelete", "staffOptions"]
+    .map((action) => `api::patron.patron.${action}`),
+  ...["adminList", "fulfill", "reject"].map((action) => `api::loan-request.loan-request.${action}`),
+  ...["getStatusCounts", "getAdminList", "getPrintData"].map((action) => `api::loan.loan.${action}`),
+  "api::loan-item.loan-item.remindNotification",
+  "api::copy.copy.lookup",
+];
+
 const STAFF_ONLY_ACTIONS = [
+  ...STAFF_MANAGEMENT_ACTIONS,
   "api::patron.patron.lookup",
   "api::loan.loan.checkout",
   "api::loan.loan.returnBook",
@@ -114,6 +130,7 @@ const READER_ACTIONS = [
   "api::loan-item.loan-item.meCurrent",
   "api::loan-item.loan-item.meHistory",
   "api::loan-item.loan-item.renewMine",
+  ...["mine", "createMine", "cancelMine"].map((action) => `api::loan-request.loan-request.${action}`),
 ];
 
 /** Cấp quyền API cá nhân cho độc giả và thu hồi quyền nghiệp vụ quầy khỏi vai trò không phải thủ thư. */

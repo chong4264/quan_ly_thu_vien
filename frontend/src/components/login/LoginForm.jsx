@@ -1,20 +1,20 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/auth';
 
 const ROLES = {
   reader: {
-    tab: 'Học sinh / Độc giả', icon: 'school', userIcon: 'account_circle',
-    label: 'Mã học sinh / CCCD / Email CVA',
-    placeholder: 'Ví dụ: HS2024001 hoặc minhanh@truonghoc.edu.vn',
-    hintIcon: 'info', hint: 'Học sinh dùng mã định danh in trên thẻ thư viện hoặc tài khoản VnEdu',
+    tab: 'Sinh viên / Độc giả', icon: 'school', userIcon: 'account_circle',
+    label: 'Tên đăng nhập / Email',
+    placeholder: 'Nhập tên đăng nhập hoặc email tài khoản thư viện',
+    hintIcon: 'info', hint: 'Sử dụng tài khoản thư viện đã được cấp',
     submit: 'Đăng nhập vào hệ thống',
   },
   staff: {
     tab: 'Cán bộ / Thủ thư', icon: 'badge', userIcon: 'badge',
     label: 'Mã Cán bộ / Tài khoản Thủ thư Quản trị',
-    placeholder: 'Ví dụ: thuthu hoặc thuthu@truonghoc.edu.vn',
-    hintIcon: 'admin_panel_settings', hint: 'Phân quyền dành riêng cho Giảng viên, Ban giám hiệu & Thủ thư nghiệp vụ',
+    placeholder: 'Ví dụ: thuthu.haui',
+    hintIcon: 'admin_panel_settings', hint: 'Phân quyền dành riêng cho Giảng viên, Cán bộ nhà trường & Thủ thư nghiệp vụ',
     submit: 'Đăng nhập Trang Quản trị Thư viện',
   },
 };
@@ -26,6 +26,7 @@ export default function LoginForm() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const userRef = useRef(null);
+  const submitting = useRef(false);
   const [role, setRole] = useState('reader');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -38,6 +39,8 @@ export default function LoginForm() {
 
   const submit = async (e) => {
     e.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
     setBusy(true);
     setError('');
     try {
@@ -47,6 +50,7 @@ export default function LoginForm() {
     } catch (err) {
       setError(err.message);
     } finally {
+      submitting.current = false;
       setBusy(false);
     }
   };
@@ -63,11 +67,11 @@ export default function LoginForm() {
         <div className="space-y-space-md">
           <div>
             <h2 className="font-headline-lg text-headline-lg text-on-surface">Đăng nhập tài khoản</h2>
-            <p className="font-body-md text-body-md text-on-surface-variant">Chọn phân quyền để tải dữ liệu mượn trả phù hợp</p>
+            <p className="font-body-md text-body-md text-on-surface-variant">Chọn chế độ đăng nhập đúng với tài khoản của bạn</p>
           </div>
           <div className="p-1 rounded-sm bg-surface-container-high flex items-center gap-1">
             {Object.entries(ROLES).map(([key, r]) => (
-              <button key={key} type="button" onClick={() => { setRole(key); setError(''); }}
+              <button key={key} type="button" disabled={busy} aria-pressed={role === key} onClick={() => { setRole(key); setError(''); }}
                 className={`flex-1 py-1.5 px-space-sm rounded-sm font-label-md text-label-md transition-all flex items-center justify-center gap-space-xs ${role === key ? tabOn : tabOff}`}>
                 <span className="material-symbols-outlined text-[18px]">{r.icon}</span><span>{r.tab}</span>
               </button>
@@ -105,7 +109,7 @@ export default function LoginForm() {
             <div className="flex items-center justify-between">
               <label htmlFor="passwordInput" className="block font-label-lg text-label-lg text-on-surface">Mật khẩu</label>
               <a className="font-label-md text-label-md text-primary hover:underline" href="#"
-                onClick={(e) => { e.preventDefault(); setNotice({ icon: 'info', text: 'Liên hệ thủ thư (Phòng Thư viện - Tầng 2) để đặt lại mật khẩu.' }); }}>Quên mật khẩu?</a>
+                onClick={(e) => { e.preventDefault(); setNotice({ icon: 'info', text: 'Liên hệ thủ thư (bộ phận thư viện) để đặt lại mật khẩu.' }); }}>Quên mật khẩu?</a>
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-space-sm flex items-center pointer-events-none text-outline">
@@ -132,7 +136,7 @@ export default function LoginForm() {
               <span className="font-label-md text-label-md text-on-surface-variant">Ghi nhớ phiên trên thiết bị này</span>
             </label>
             <div className="flex items-center gap-1 font-label-sm text-label-sm text-secondary">
-              <span className="material-symbols-outlined text-[14px]">shield</span><span>Mã hóa SSL 256-bit</span>
+              <span className="material-symbols-outlined text-[14px]">shield</span><span>Tài khoản thư viện HaUI</span>
             </div>
           </div>
 
@@ -158,9 +162,9 @@ export default function LoginForm() {
               </svg>
               <span className="truncate">Microsoft 365 Edu</span>
             </button>
-            <button type="button" onClick={() => sso('tài khoản VnEdu')}
+            <button type="button" onClick={() => sso('tài khoản nhà trường')}
               className="h-9 px-space-sm rounded-sm bg-surface-container-low hover:bg-surface-container text-on-surface transition-colors flex items-center justify-center gap-space-xs font-label-md text-label-md shadow-sm">
-              <span className="material-symbols-outlined text-[18px] text-primary">school</span><span className="truncate">Tài khoản VnEdu</span>
+              <span className="material-symbols-outlined text-[18px] text-primary">school</span><span className="truncate">Tài khoản nhà trường</span>
             </button>
           </div>
           <button type="button" onClick={scanCard}
@@ -171,7 +175,7 @@ export default function LoginForm() {
         </div>
 
         <div className="p-space-md rounded-sm bg-surface-container-low text-center space-y-1">
-          <p className="font-body-sm text-body-sm text-on-surface-variant">Bạn là học sinh mới trúng tuyển hoặc chưa có mã đọc?</p>
+          <p className="font-body-sm text-body-sm text-on-surface-variant">Bạn là sinh viên mới trúng tuyển hoặc chưa có mã đọc?</p>
           <a href="#" onClick={(e) => { e.preventDefault(); setNotice({ icon: 'info', text: 'Liên hệ thủ thư để được cấp thẻ và tài khoản.' }); }}
             className="inline-flex items-center gap-1 font-label-md text-label-md text-primary font-semibold hover:underline">
             <span>Đăng ký mở thẻ thư viện trực tuyến</span><span className="material-symbols-outlined text-[16px]">arrow_forward</span>
@@ -179,7 +183,7 @@ export default function LoginForm() {
         </div>
 
         <div className="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
-          <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">domain</span><span>Phòng Thư viện CVA - Tầng 2</span></span>
+          <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">domain</span><span>Thư viện HaUI</span></span>
           <a href="#" onClick={(e) => { e.preventDefault(); setNotice({ icon: 'info', text: 'Liên hệ thủ thư để được cấp lại mã thẻ.' }); }}
             className="hover:text-primary transition-colors flex items-center gap-1">
             <span className="material-symbols-outlined text-[14px]">contact_support</span><span>Yêu cầu cấp lại mã thẻ</span>

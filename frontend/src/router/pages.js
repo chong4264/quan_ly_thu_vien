@@ -14,6 +14,19 @@ import QuayTraGiaHan from '../pages/admin/QuayTraGiaHan';
 import SachDangMuon from '../pages/reader/SachDangMuon';
 import ThemMoiSuaSach from '../pages/admin/ThemMoiSuaSach';
 import TraCuuSach from '../pages/reader/TraCuuSach';
+import YeuCauMuon from '../pages/reader/YeuCauMuon';
+import QuanLyYeuCauMuon from '../pages/admin/YeuCauMuon';
 
-export const adminRoutes = [["bao-cao-thong-ke",BaoCaoThongKe],["cau-hinh-he-thong",CauHinhHeThong],["dashboard-tong-quan",DashboardTongQuan],["quan-ly-ban-sao",QuanLyBanSao],["quan-ly-doc-gia",QuanLyDocGia],["phieu-muon-tra",PhieuMuonTra],["quan-ly-the-loai",QuanLyTheLoai],["quan-ly-dau-sach",QuanLyDauSach],["quay-muon-sach",QuayMuonSach],["quay-tra-gia-han",QuayTraGiaHan],["them-moi-sua-sach",ThemMoiSuaSach]];
-export const readerRoutes = [["chi-tiet-sach",ChiTietSach],["ho-so-ca-nhan",HoSoCaNhan],["lich-su-muon",LichSuMuon],["sach-dang-muon",SachDangMuon],["tra-cuu-sach",TraCuuSach]];
+export const adminRoutes = [
+  ['bao-cao-thong-ke', BaoCaoThongKe], ['cau-hinh-he-thong', CauHinhHeThong],
+  ['dashboard-tong-quan', DashboardTongQuan], ['quan-ly-ban-sao', QuanLyBanSao],
+  ['quan-ly-doc-gia', QuanLyDocGia], ['phieu-muon-tra', PhieuMuonTra],
+  ['quan-ly-the-loai', QuanLyTheLoai], ['quan-ly-dau-sach', QuanLyDauSach],
+  ['quay-muon-sach', QuayMuonSach], ['quay-tra-gia-han', QuayTraGiaHan],
+  ['them-moi-sua-sach', ThemMoiSuaSach], ['quan-ly-yeu-cau-muon', QuanLyYeuCauMuon],
+];
+export const readerRoutes = [
+  ['chi-tiet-sach', ChiTietSach], ['ho-so-ca-nhan', HoSoCaNhan],
+  ['lich-su-muon', LichSuMuon], ['sach-dang-muon', SachDangMuon],
+  ['tra-cuu-sach', TraCuuSach], ['yeu-cau-muon', YeuCauMuon],
+];

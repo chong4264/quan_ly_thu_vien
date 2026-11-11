@@ -1,16 +1,48 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import NavItem from '../common/NavItem';
-import { useToast } from '../../context/ToastContext';
+import UniversityBrand from '../common/UniversityBrand';
+import LogoutButton from '../common/LogoutButton';
+import { useAuth } from '../../context/auth';
+import { displayName, roleName } from '../../lib/user-profile';
+
+const links = [
+  ['tra-cuu-sach', 'Tra cứu sách'], ['sach-dang-muon', 'Sách đang mượn'],
+  ['yeu-cau-muon', 'Yêu cầu mượn'],
+  ['lich-su-muon', 'Lịch sử mượn'], ['ho-so-ca-nhan', 'Hồ sơ cá nhân'],
+];
 
 export default function ReaderHeader() {
   const navigate = useNavigate();
-  const toast = useToast();
-  const goSearch = (e) => {
-    if (e.key !== 'Enter') return;
-    const v = e.currentTarget.value.trim();
-    navigate(v ? `/tra-cuu-sach?q=${encodeURIComponent(v)}` : '/tra-cuu-sach');
-  };
+  const { user, isStaff } = useAuth();
+  function search(event) {
+    if (event.key !== 'Enter') return;
+    const params = new URLSearchParams();
+    if (event.currentTarget.value.trim()) params.set('q', event.currentTarget.value.trim());
+    navigate('/tra-cuu-sach?' + params);
+  }
   return (
-    <header className="fixed top-0 w-full z-50 bg-surface-container-lowest border-b border-surface-container shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div className="h-16 w-full max-w-[1600px] mx-auto px-margin lg:px-margin-desktop flex items-center justify-between gap-space-md"><div className="flex items-center gap-space-lg"><div className="flex items-center gap-space-sm"><div className="w-9 h-9 bg-primary-container text-on-primary rounded-lg flex items-center justify-center font-headline-sm text-headline-sm font-bold shadow-sm"><span className="material-symbols-outlined text-[20px]">local_library</span></div><div><span className="block font-headline-sm text-headline-sm font-bold tracking-tight text-on-surface leading-tight">EduLib LMS</span><span className="block font-label-sm text-label-sm text-on-surface-variant font-medium">THPT Chuyên Chu Văn An</span></div></div><div className="hidden md:flex items-center bg-surface-container-low p-space-xs rounded-lg border border-surface-container"><NavItem to="tra-cuu-sach" className="px-space-md py-1 rounded text-primary-container font-label-md text-label-md font-semibold bg-surface-container-lowest shadow-sm">Cổng Học sinh / Độc giả</NavItem><NavItem to="dashboard-tong-quan" className="px-space-md py-1 rounded text-on-surface-variant font-label-md text-label-md hover:text-on-surface hover:bg-surface-container transition-colors">Quản trị Thư viện</NavItem></div></div><div className="hidden lg:flex flex-1 max-w-md mx-space-md"><div className="relative w-full"><span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span><input className="w-full h-9 pl-9 pr-3 bg-surface-container-low border border-surface-container rounded-sm font-body-sm text-body-sm text-on-surface placeholder-on-surface-variant focus:border-primary-container focus:bg-surface-container-lowest focus:outline-none transition-colors" placeholder="Tra cứu nhan đề sách, tác giả, số phân loại DDC..." type="text" onKeyDown={goSearch} /></div></div><div className="flex items-center gap-space-md"><button className="relative p-space-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors" title="Thông báo" onClick={()=>toast("Thông báo")}><span className="material-symbols-outlined text-[22px]">notifications</span><span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-error ring-2 ring-surface-container-lowest" /></button><div className="flex items-center gap-space-sm pl-space-sm border-l border-surface-container"><div className="hidden sm:flex flex-col text-right"><span className="font-label-md text-label-md font-semibold text-on-surface leading-tight">Trần Bảo Nam</span><span className="font-label-sm text-label-sm text-on-surface-variant">Học sinh - 12A1</span></div><div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span className="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div><nav className="w-full border-t border-surface-container bg-surface-container-lowest" data-active-classes="text-primary-container border-b-2 border-primary-container font-semibold"><div className="w-full max-w-[1600px] mx-auto px-margin lg:px-margin-desktop flex items-center gap-space-lg overflow-x-auto h-11"><NavItem to="tra-cuu-sach" active="text-primary-container border-b-2 border-primary-container font-semibold" className="h-full inline-flex items-center font-label-md text-label-md text-on-surface-variant hover:text-on-surface whitespace-nowrap transition-colors">Tra cứu sách</NavItem><NavItem to="chi-tiet-sach" active="text-primary-container border-b-2 border-primary-container font-semibold" className="h-full inline-flex items-center font-label-md text-label-md text-on-surface-variant hover:text-on-surface whitespace-nowrap transition-colors">Chi tiết sách</NavItem><NavItem to="sach-dang-muon" active="text-primary-container border-b-2 border-primary-container font-semibold" className="h-full inline-flex items-center font-label-md text-label-md text-on-surface-variant hover:text-on-surface whitespace-nowrap transition-colors">Sách đang mượn</NavItem><NavItem to="lich-su-muon" active="text-primary-container border-b-2 border-primary-container font-semibold" className="h-full inline-flex items-center font-label-md text-label-md text-on-surface-variant hover:text-on-surface whitespace-nowrap transition-colors">Lịch sử mượn</NavItem><NavItem to="ho-so-ca-nhan" active="text-primary-container border-b-2 border-primary-container font-semibold" className="h-full inline-flex items-center font-label-md text-label-md text-on-surface-variant hover:text-on-surface whitespace-nowrap transition-colors">Hồ sơ cá nhân</NavItem></div></nav></header>
+    <header className="fixed top-0 z-50 w-full border-b border-surface-container bg-surface-container-lowest shadow-sm">
+      <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between gap-3 px-4 lg:px-margin-desktop">
+        <Link to="/tra-cuu-sach" className="min-w-0"><UniversityBrand /></Link>
+        <input aria-label="Tìm kiếm sách" className="hidden h-9 min-w-0 max-w-sm flex-1 rounded-sm border border-outline-variant bg-surface px-3 text-sm xl:block"
+          type="search" placeholder="Tên sách, tác giả hoặc ISBN…" onKeyDown={search} />
+        <div className="flex shrink-0 items-center gap-3">
+          {isStaff && <Link to="/dashboard-tong-quan" className="hidden rounded-sm bg-surface-container-low px-3 py-2 text-sm text-primary lg:block">Quản trị thư viện</Link>}
+          <Link to="/ho-so-ca-nhan" aria-label="Hồ sơ cá nhân" className="flex items-center gap-2">
+            <span className="material-symbols-outlined rounded-full bg-primary p-2 text-on-primary" aria-hidden="true">person</span>
+            <span className="hidden text-right text-sm md:block"><span className="block font-semibold">{displayName(user)}</span><span className="block text-xs text-on-surface-variant">{roleName(user)}</span></span>
+          </Link>
+          <LogoutButton compact />
+        </div>
+      </div>
+      <nav aria-label="Điều hướng độc giả" className="border-t border-surface-container">
+        <div className="mx-auto flex h-11 max-w-[1600px] items-center gap-6 overflow-x-auto px-4 lg:px-margin-desktop">
+          {links.filter(([to]) => !isStaff || to !== 'yeu-cau-muon').map(([to, label]) => (
+            <NavItem key={to} to={to} active="border-b-2 border-primary font-semibold text-primary"
+              className="inline-flex h-full shrink-0 items-center text-sm text-on-surface-variant hover:text-primary">{label}</NavItem>
+          ))}
+        </div>
+      </nav>
+    </header>
   );
 }

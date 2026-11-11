@@ -17,7 +17,7 @@ export default function QuayMuonSachPage() {
         <CounterHeader active="borrow" count={count} />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
           <div className="lg:col-span-5"><PatronLookup patron={patron} onChange={setPatron} refreshKey={refresh} /></div>
-          <div className="lg:col-span-7"><BorrowCart patron={patron} onDone={done} /></div>
+          <div className="lg:col-span-7"><BorrowCart key={patron?.documentId || 'empty'} patron={patron} onDone={done} /></div>
         </div>
         <ShiftTable
           title="Lịch sử mượn trong ca trực" endpoint="/loans/shift-history" refreshKey={refresh} onCount={setCount}

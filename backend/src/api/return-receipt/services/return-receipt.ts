@@ -4,7 +4,7 @@ import { UID, docs, startOfTodayISO } from "../../../utils/library";
 export default factories.createCoreService("api::return-receipt.return-receipt", ({ strapi }) => ({
   async shiftHistory({ from, to, librarianId }: any) {
     const filters: any = { returnedAt: { $gte: from || startOfTodayISO(), $lte: to || new Date().toISOString() } };
-    if (librarianId) filters.librarian = { documentId: { $eq: librarianId } };
+    if (librarianId) filters.librarian = { id: { $eq: librarianId } };
     const rows = await docs(strapi, UID.returnReceipt).findMany({
       filters,
       sort: ["returnedAt:desc"],

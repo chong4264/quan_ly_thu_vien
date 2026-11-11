@@ -1,3 +1,5 @@
+import { findUserPatron, userProfile } from '../../utils/user-profile';
+
 export default (plugin: any) => {
   const originalMe = plugin.controllers.user.me;
   plugin.controllers.user.me = async (context: any) => {
@@ -5,6 +7,10 @@ export default (plugin: any) => {
     const role = context.state.user?.role;
     if (context.body && role) {
       context.body.role = { id: role.id, name: role.name, type: role.type };
+    }
+    if (context.body && context.state.user) {
+      const patron = await findUserPatron(strapi, context.state.user);
+      context.body.profile = userProfile(context.state.user, patron);
     }
   };
   return plugin;

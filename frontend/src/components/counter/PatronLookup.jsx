@@ -24,7 +24,7 @@ export default function PatronLookup({ patron, onChange, refreshKey = 0 }) {
   };
   const searchByName = async () => {
     const v = input.trim();
-    if (!v) return toast('Nhập họ tên hoặc mã học sinh');
+    if (!v) return toast('Nhập họ tên hoặc mã sinh viên');
     setBusy(true);
     try { pick(await find({ q: v })); } catch (e) { toast(e.message); } finally { setBusy(false); }
   };
@@ -52,7 +52,7 @@ export default function PatronLookup({ patron, onChange, refreshKey = 0 }) {
         <div className="relative flex-1">
           <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-[18px]">barcode_scanner</span>
           <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && scan()}
-            placeholder="Quét mã thẻ hoặc nhập mã học sinh, rồi nhấn Enter..." autoFocus
+            placeholder="Quét mã thẻ hoặc nhập mã sinh viên, rồi nhấn Enter..." autoFocus
             className="w-full h-9 pl-9 pr-3 bg-surface-container-low font-code-md text-code-md rounded-sm focus:outline-none focus:ring-1 focus:ring-primary-container" />
         </div>
         <button onClick={searchByName} disabled={busy}
@@ -94,7 +94,7 @@ export default function PatronLookup({ patron, onChange, refreshKey = 0 }) {
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-2 mt-2">
-                <div><span className="font-label-sm text-label-sm text-outline block">Mã học sinh:</span><span className="font-code-md text-code-md font-semibold">{patron.studentCode}</span></div>
+                <div><span className="font-label-sm text-label-sm text-outline block">Mã sinh viên:</span><span className="font-code-md text-code-md font-semibold">{patron.studentCode}</span></div>
                 <div><span className="font-label-sm text-label-sm text-outline block">Thẻ:</span><span className="font-code-md text-code-md font-semibold">{patron.cardBarcode}</span></div>
               </div>
             </div>

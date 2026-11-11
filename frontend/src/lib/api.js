@@ -1,7 +1,13 @@
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:1337';
 
 export const getToken = () => localStorage.getItem('jwt') || sessionStorage.getItem('jwt');
-export const clearToken = () => { localStorage.removeItem('jwt'); sessionStorage.removeItem('jwt'); };
+export const getDeviceId = () => localStorage.getItem('authDeviceId') || sessionStorage.getItem('authDeviceId');
+export const clearToken = () => {
+  for (const storage of [localStorage, sessionStorage]) {
+    storage.removeItem('jwt');
+    storage.removeItem('authDeviceId');
+  }
+};
 
 /** Gọi Strapi. path bắt đầu bằng "/", ví dụ api('/books'). Lỗi trả về là Error có message tiếng Việt. */
 export async function api(path, { method = 'GET', body } = {}) {
@@ -11,6 +17,7 @@ export async function api(path, { method = 'GET', body } = {}) {
   try {
     res = await fetch(`${API_URL}/api${path}`, {
       method,
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: body ? JSON.stringify(body) : undefined,
     });
@@ -19,7 +26,7 @@ export async function api(path, { method = 'GET', body } = {}) {
   }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    if (res.status === 401 && token && !path.startsWith('/auth/')) {
+    if (res.status === 401 && token && token === getToken() && !path.startsWith('/auth/')) {
       clearToken();
       window.dispatchEvent(new Event('auth:expired'));
     }

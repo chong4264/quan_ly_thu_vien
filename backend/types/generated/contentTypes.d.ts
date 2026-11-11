@@ -665,6 +665,56 @@ export interface ApiLoanItemLoanItem extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiLoanRequestLoanRequest extends Struct.CollectionTypeSchema {
+  collectionName: 'loan_requests';
+  info: {
+    displayName: 'Y\u00EAu c\u1EA7u m\u01B0\u1EE3n online';
+    pluralName: 'loan-requests';
+    singularName: 'loan-request';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    book: Schema.Attribute.Relation<'manyToOne', 'api::book.book'> &
+      Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    loan: Schema.Attribute.Relation<'manyToOne', 'api::loan.loan'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::loan-request.loan-request'
+    > &
+      Schema.Attribute.Private;
+    note: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 500;
+      }>;
+    patron: Schema.Attribute.Relation<'manyToOne', 'api::patron.patron'> &
+      Schema.Attribute.Required;
+    processedAt: Schema.Attribute.DateTime;
+    processedBy: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    responseNote: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 500;
+      }>;
+    status: Schema.Attribute.Enumeration<
+      ['pending', 'fulfilled', 'rejected', 'cancelled']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'pending'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiLoanLoan extends Struct.CollectionTypeSchema {
   collectionName: 'loans';
   info: {
@@ -1383,6 +1433,7 @@ declare module '@strapi/strapi' {
       'api::copy.copy': ApiCopyCopy;
       'api::library-setting.library-setting': ApiLibrarySettingLibrarySetting;
       'api::loan-item.loan-item': ApiLoanItemLoanItem;
+      'api::loan-request.loan-request': ApiLoanRequestLoanRequest;
       'api::loan.loan': ApiLoanLoan;
       'api::patron-type.patron-type': ApiPatronTypePatronType;
       'api::patron.patron': ApiPatronPatron;

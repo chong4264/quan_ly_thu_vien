@@ -1,10 +1,18 @@
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../../context/auth';
+import { displayName, roleName } from '../../../lib/user-profile';
 
 export default function Section1() {
+  const { user } = useAuth();
+  const patron = user?.profile?.patron;
   return (
-    <>
-<div className="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col lg:flex-row lg:items-center justify-between gap-space-md"> <div className="flex items-start gap-space-md"> <div className="w-12 h-12 rounded-xl bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-sm"> <span className="material-symbols-outlined text-[28px]">school</span> </div> <div> <div className="flex items-center gap-space-sm flex-wrap"> <span className="font-headline-md text-headline-md font-bold text-on-surface">Chào mừng, Trần Bảo Nam</span> <span className="font-label-sm text-label-sm bg-surface-container-high text-primary font-semibold px-2 py-0.5 rounded-sm">Lớp 12A1</span> <span className="font-code-md text-code-md text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-sm">Mã ĐG: HS-20221204</span> </div> <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-          Học kỳ I — Niên khóa 2024-2025. Chúc bạn có những giờ tự học và nghiên cứu hiệu quả tại Thư viện!
-        </p> </div> </div>  <div className="flex items-center gap-space-md shrink-0 flex-wrap sm:flex-nowrap"> <div className="bg-surface-container-low px-space-md py-2.5 rounded-xl flex items-center gap-space-md"> <div className="w-10 h-10 rounded-lg bg-surface-container-lowest text-primary flex items-center justify-center shadow-xs"> <span className="material-symbols-outlined text-[22px]">auto_stories</span> </div> <div> <span className="block font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide">Sách đang giữ</span> <span className="block font-headline-sm text-headline-sm font-bold text-on-surface">02 <span className="font-body-sm text-body-sm font-normal text-on-surface-variant">/ 05 cuốn tối đa</span></span> </div> </div> <div className="bg-surface-container-low px-space-md py-2.5 rounded-xl flex items-center gap-space-md"> <div className="w-10 h-10 rounded-lg bg-tertiary-fixed text-tertiary flex items-center justify-center shadow-xs"> <span className="material-symbols-outlined text-[22px]">event_upcoming</span> </div> <div> <span className="block font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide">Hạn trả gần nhất</span> <div className="flex items-center gap-1.5"> <span className="font-headline-sm text-headline-sm font-bold text-tertiary">15/11/2024</span> <span className="font-label-sm text-label-sm bg-tertiary-fixed text-tertiary-container px-1.5 py-0.2 rounded-sm font-semibold">Còn 3 ngày</span> </div> </div> </div> </div> </div>
-    </>
+    <section className="flex flex-wrap items-center justify-between gap-4 rounded-xl bg-surface-container-lowest p-6 shadow-sm">
+      <div>
+        <h1 className="text-xl font-bold text-on-surface">Chào mừng, {displayName(user)}</h1>
+        <p className="mt-2 text-sm text-on-surface-variant">{roleName(user)}{patron?.className ? ' · ' + patron.className : ''}{patron?.studentCode ? ' · ' + patron.studentCode : ''}</p>
+        <p className="mt-2 text-on-surface-variant">Tra cứu tài liệu phục vụ học tập, giảng dạy và nghiên cứu tại Đại học Công nghiệp Hà Nội.</p>
+      </div>
+      <Link to="/sach-dang-muon" className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-sm text-on-primary"><span className="material-symbols-outlined" aria-hidden="true">auto_stories</span>Xem sách đang mượn</Link>
+    </section>
   );
 }

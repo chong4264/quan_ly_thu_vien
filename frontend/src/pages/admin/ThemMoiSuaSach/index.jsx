@@ -30,7 +30,7 @@ const statuses = [
 const policies = [
   ['allowHomeLoan', 'Cho phép mượn về nhà'],
   ['referenceOnly', 'Tài liệu chỉ đọc tại chỗ'],
-  ['priorityGifted', 'Ưu tiên học sinh chuyên'],
+  ['priorityGifted', 'Ưu tiên sinh viên nghiên cứu'],
 ];
 
 function formFromBook(book = {}) {

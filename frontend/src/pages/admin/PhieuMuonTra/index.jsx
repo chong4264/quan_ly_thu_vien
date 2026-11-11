@@ -18,7 +18,13 @@ export default function PhieuMuonTraPage() {
   const [selected, setSelected] = useState([]);
   const [counts, setCounts] = useState({});
 
-  useEffect(() => { api('/loans/status-counts').then(setCounts).catch(e => toast(e.message)); }, [toast]);
+  useEffect(() => {
+    let active = true;
+    const load = () => api('/loans/status-counts').then((data) => { if (active) setCounts(data); }).catch(e => { if (active) toast(e.message); });
+    load();
+    window.addEventListener('loan-list:refresh', load);
+    return () => { active = false; window.removeEventListener('loan-list:refresh', load); };
+  }, [toast]);
 
   const getSelectedLoans = useCallback(async () => {
     if (!selected.length) { toast('Vui lòng chọn ít nhất một phiếu'); return []; }

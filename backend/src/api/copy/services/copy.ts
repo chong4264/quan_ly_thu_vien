@@ -2,9 +2,13 @@ import { factories } from "@strapi/strapi";
 import { ApplicationError, NotFoundError, UID, docs } from "../../../utils/library";
 
 export const copyBlockReason = (c: any): string | null => {
+  if (!c?.book) return "Bản sao chưa được gắn với đầu sách";
+  if (c.book.status === "discontinued") return "Đầu sách đã ngừng lưu hành";
+  if (c.book.status === "restricted") return "Đầu sách đang hạn chế lưu hành";
   if (c.circulationStatus === "borrowed") return "Bản sao đang được mượn";
   if (c.circulationStatus === "processing") return "Bản sao đang xử lý, chưa cho mượn";
   if (c.circulationStatus === "lost") return "Bản sao đã bị mất";
+  if (c.circulationStatus !== "available") return "Bản sao chưa sẵn sàng cho mượn";
   if (c.condition === "damaged") return "Bản sao đang hư hỏng";
   if (c.book?.referenceOnly) return "Sách chỉ đọc tại chỗ";
   if (c.book?.allowHomeLoan === false) return "Sách không cho mượn về nhà";
