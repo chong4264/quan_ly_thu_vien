@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:1337';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:1337';
 
 export const getToken = () => localStorage.getItem('jwt') || sessionStorage.getItem('jwt');
 export const clearToken = () => { localStorage.removeItem('jwt'); sessionStorage.removeItem('jwt'); };
@@ -30,3 +30,6 @@ export async function api(path, { method = 'GET', body } = {}) {
 }
 
 export const qs = (params) => new URLSearchParams(params).toString();
+
+/** Ảnh bìa từ Strapi trả về đường dẫn tương đối (/uploads/...) nên cần ghép địa chỉ máy chủ */
+export const coverUrl = (u) => (!u ? null : /^https?:/.test(u) ? u : `${API_URL}${u}`);

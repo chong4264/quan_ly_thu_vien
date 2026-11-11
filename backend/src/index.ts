@@ -1,6 +1,7 @@
 import type { Core } from "@strapi/strapi";
 import mysql from "mysql2/promise";
 import { seedExtra } from "./seedExtra";
+import { grantReaderPermissions } from "./utils/permissions";
 
 export default {
   async register({ strapi }: { strapi: Core.Strapi }) {
@@ -32,6 +33,12 @@ export default {
   },
 
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    try {
+      await grantReaderPermissions(strapi);
+    } catch (e: any) {
+      console.warn("⚠️ Không cấp được quyền API tra cứu sách:", e.message);
+    }
+
     try {
       const categoryUid = "api::category.category";
       const bookUid = "api::book.book";
