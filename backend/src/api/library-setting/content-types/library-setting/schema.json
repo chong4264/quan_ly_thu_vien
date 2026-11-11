@@ -15,10 +15,6 @@
       "type": "decimal",
       "default": 1000
     },
-    "damageCompensationRate": {
-      "type": "integer",
-      "default": 20
-    },
     "lostCompensationRate": {
       "type": "integer",
       "default": 100
@@ -33,13 +29,21 @@
     },
     "overdueRemindEvery": {
       "type": "enumeration",
+      "default": "daily",
       "enum": [
         "daily",
         "every_2_days",
         "every_3_days",
         "weekly"
-      ],
-      "default": "daily"
+      ]
+    },
+    "scratchedCompensationAmount": {
+      "type": "biginteger",
+      "default": "20000"
+    },
+    "damagedCompensationAmount": {
+      "type": "biginteger",
+      "default": "50000"
     }
   }
 }

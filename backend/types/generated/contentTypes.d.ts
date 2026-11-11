@@ -596,8 +596,8 @@ export interface ApiLibrarySettingLibrarySetting
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    damageCompensationRate: Schema.Attribute.Integer &
-      Schema.Attribute.DefaultTo<20>;
+    damagedCompensationAmount: Schema.Attribute.BigInteger &
+      Schema.Attribute.DefaultTo<'50000'>;
     finePerDay: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<1000>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -613,6 +613,8 @@ export interface ApiLibrarySettingLibrarySetting
       Schema.Attribute.DefaultTo<'daily'>;
     publishedAt: Schema.Attribute.DateTime;
     remindBeforeDays: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<2>;
+    scratchedCompensationAmount: Schema.Attribute.BigInteger &
+      Schema.Attribute.DefaultTo<'20000'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

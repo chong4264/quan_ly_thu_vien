@@ -1,6 +1,6 @@
 import { factories } from "@strapi/strapi";
 import {
-  ACTIVE, ApplicationError, NotFoundError, UID, addDays, docs, getSettings, lateDays, todayStr,
+  ACTIVE, ApplicationError, compensationTable, NotFoundError, UID, addDays, docs, getSettings, lateDays, todayStr,
 } from "../../../utils/library";
 
 export default factories.createCoreService("api::loan-item.loan-item", ({ strapi }) => ({
@@ -14,7 +14,8 @@ export default factories.createCoreService("api::loan-item.loan-item", ({ strapi
     });
     if (!patron) throw new NotFoundError("Không tìm thấy độc giả");
 
-    const { finePerDay } = await getSettings(strapi);
+    const s = await getSettings(strapi);
+    const finePerDay = s.finePerDay;
     const today = todayStr();
     const items = await docs(strapi, UID.loanItem).findMany({
       filters: { status: { $in: ACTIVE }, loan: { patron: { documentId: { $eq: patron.documentId } } } },
@@ -27,12 +28,15 @@ export default factories.createCoreService("api::loan-item.loan-item", ({ strapi
 
     return {
       patron: { documentId: patron.documentId, fullName: patron.fullName, className: patron.className, cardStatus: patron.cardStatus },
+      finePerDay,
       data: items.map((i: any) => {
         const late = lateDays(i.dueDate, today);
+        const price = Number(i.copy?.book?.price || 0);
         return {
           loanItemId: i.documentId,
           loanCode: i.loan?.code,
           accessionNo: i.copy?.accessionNo,
+          barcode: i.copy?.barcode,
           title: i.copy?.book?.title,
           loanedAt: i.loan?.loanedAt,
           dueDate: i.dueDate,
@@ -41,6 +45,8 @@ export default factories.createCoreService("api::loan-item.loan-item", ({ strapi
           canRenew: cardOk && late === 0 && i.renewCount < max,
           lateDays: late,
           fine: late * finePerDay,
+          bookPrice: price,
+          compensation: compensationTable(price, s),
         };
       }),
     };

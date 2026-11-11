@@ -1,6 +1,7 @@
 import { factories } from "@strapi/strapi";
 import {
   ACTIVE,
+  compensationFor,
   ApplicationError,
   NotFoundError,
   UID,
@@ -174,13 +175,8 @@ export default factories.createCoreService("api::loan.loan", ({ strapi }) => ({
     const late = lateDays(item.dueDate);
     const lateFine = late * s.finePerDay;
     const price = Number(item.copy?.book?.price || 0);
-    const rate =
-      returnCondition === "damaged"
-        ? s.damageRate
-        : returnCondition === "lost"
-          ? s.lostRate
-          : 0;
-    const compensation = Math.round((price * rate) / 100);
+    const compensation = compensationFor(returnCondition, price, s);
+
     const total = lateFine + compensation;
 
     const now = new Date().toISOString();
