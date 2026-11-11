@@ -2,6 +2,7 @@ import type { Core } from "@strapi/strapi";
 import mysql from "mysql2/promise";
 import { seedExtra } from "./seedExtra";
 import { ensureLibrarianRole, ensureReaderPermissions, registerBookManagement } from "./utils/book-management";
+import { grantReaderPermissions } from "./utils/permissions";
 
 export default {
   async register({ strapi }: { strapi: Core.Strapi }) {
@@ -396,6 +397,11 @@ export default {
     } finally {
       await ensureLibrarianRole(strapi);
       await ensureReaderPermissions(strapi);
+      try {
+        await grantReaderPermissions(strapi);
+      } catch (e: any) {
+        console.warn("⚠️ Không cấp được quyền API tra cứu sách:", e.message);
+      }
     }
   },
 };

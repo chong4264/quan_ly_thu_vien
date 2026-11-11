@@ -16,3 +16,6 @@ export const addDaysFromToday = (n) => {
   return d;
 };
 export const CONDITION = { normal: 'Nguyên vẹn', scratched: 'Trầy xước nhẹ', damaged: 'Rách, hư hại', lost: 'Mất sách' };
+export const LANGUAGE = { vie: 'Tiếng Việt', eng: 'Tiếng Anh', fra: 'Tiếng Pháp', zho: 'Tiếng Trung', rus: 'Tiếng Nga' };
+export const COPY_CONDITION = { new: 'Mới', good: 'Tốt', worn: 'Đã cũ', damaged: 'Hư hại' };
+export const CIRCULATION = { available: 'Có sẵn trên kệ', borrowed: 'Đang mượn', processing: 'Đang xử lý', lost: 'Đã mất' };

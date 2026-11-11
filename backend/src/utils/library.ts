@@ -7,6 +7,7 @@ export const UID = {
   shelf: "api::shelf.shelf",
   patronType: "api::patron-type.patron-type",
   book: "api::book.book",
+  category: "api::category.category",
   copy: "api::copy.copy",
   patron: "api::patron.patron",
   loan: "api::loan.loan",
