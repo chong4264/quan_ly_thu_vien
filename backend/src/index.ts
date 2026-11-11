@@ -1,9 +1,11 @@
 import type { Core } from "@strapi/strapi";
 import mysql from "mysql2/promise";
 import { seedExtra } from "./seedExtra";
+import { ensureLibrarianRole, registerBookManagement } from "./utils/book-management";
 
 export default {
   async register({ strapi }: { strapi: Core.Strapi }) {
+    registerBookManagement(strapi);
     if (process.env.DATABASE_CLIENT === "mysql") {
       const host = process.env.DATABASE_HOST || "127.0.0.1";
       const port = Number(process.env.DATABASE_PORT) || 3306;
@@ -388,8 +390,11 @@ export default {
       }
 
       console.log("🎉 Hoàn tất: 3 danh mục và 15 đầu sách!");
+      await seedExtra(strapi);
     } catch (err: any) {
       console.error("❌ Lỗi khi nạp dữ liệu mẫu:", err.message || err);
+    } finally {
+      await ensureLibrarianRole(strapi);
     }
   },
 };

@@ -4,7 +4,7 @@ import { api, clearToken, getToken } from "../lib/api";
 const AuthCtx = createContext(null);
 export const useAuth = () => useContext(AuthCtx);
 export const isStaffRole = (u) =>
-  !!u && !["Authenticated", "Public", "reader"].includes(u.role?.name);
+  !!u?.role?.type && !["authenticated", "public", "reader"].includes(u.role.type);
 
 const ERRORS = {
   "Invalid identifier or password": "Sai tài khoản hoặc mật khẩu",
