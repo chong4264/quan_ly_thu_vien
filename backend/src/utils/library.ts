@@ -35,14 +35,53 @@ export const lateDays = (due: string, today = todayStr()) =>
 export const startOfTodayISO = () => `${todayStr()}T00:00:00+07:00`;
 
 // ───── Cấu hình hệ thống ─────
+
 export async function getSettings(strapi: Core.Strapi) {
   const s = await docs(strapi, UID.setting).findFirst();
+
   return {
     finePerDay: Number(s?.finePerDay ?? 1000),
-    damageRate: Number(s?.damageCompensationRate ?? 20),
+
+    scratchedCompensationAmount: Number(
+      s?.scratchedCompensationAmount ?? 20000
+    ),
+
+    damagedCompensationAmount: Number(
+      s?.damagedCompensationAmount ?? 50000
+    ),
+
     lostRate: Number(s?.lostCompensationRate ?? 100),
+
+    autoLockAfterDays: Number(s?.autoLockAfterDays ?? 7),
+    remindBeforeDays: Number(s?.remindBeforeDays ?? 3),
+    overdueRemindEvery: s?.overdueRemindEvery ?? "daily",
   };
 }
+
+
+type Settings = Awaited<ReturnType<typeof getSettings>>;
+
+/** Tiền bồi thường theo tình trạng sách khi trả (một nguồn duy nhất cho cả xem trước lẫn tính thật) */
+export function compensationFor(condition: string, price: number, s: Settings): number {
+  switch (condition) {
+    case "scratched":
+      return s.scratchedCompensationAmount;
+    case "damaged":
+      return s.damagedCompensationAmount;
+    case "lost":
+      return Math.round((price * s.lostRate) / 100);
+    default:
+      return 0;
+  }
+}
+
+/** Bảng bồi thường cho cả 4 tình trạng, để giao diện hiển thị ngay khi thủ thư chọn */
+export const compensationTable = (price: number, s: Settings) => ({
+  normal: compensationFor("normal", price, s),
+  scratched: compensationFor("scratched", price, s),
+  damaged: compensationFor("damaged", price, s),
+  lost: compensationFor("lost", price, s),
+});
 
 /** Sinh mã phiếu dạng PM-20261108-0001 */
 export async function genCode(strapi: Core.Strapi, uid: string, letters: string) {

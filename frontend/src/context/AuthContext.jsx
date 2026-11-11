@@ -3,9 +3,11 @@ import { api, clearToken, getToken } from "../lib/api";
 
 const AuthCtx = createContext(null);
 export const useAuth = () => useContext(AuthCtx);
-export const isStaffRole = (u) =>
-  !!u && !["Authenticated", "Public", "reader"].includes(u.role?.name);
 
+const STAFF_ROLES = ["librarian"];
+
+export const isStaffRole = (u) =>
+  !!u && STAFF_ROLES.includes((u.role?.name || "").trim().toLowerCase());
 const ERRORS = {
   "Invalid identifier or password": "Sai tài khoản hoặc mật khẩu",
   "Your account has been blocked by the administrator":
@@ -48,6 +50,7 @@ export function AuthProvider({ children }) {
       clearToken();
       (remember ? localStorage : sessionStorage).setItem("jwt", jwt);
       const me = await api("/users/me?populate=role");
+      console.log("ME =", me);
       if (requireStaff && !isStaffRole(me)) {
         clearToken();
         throw new Error("Tài khoản này không có quyền Cán bộ / Thủ thư");

@@ -1,11 +1,30 @@
+import { useEffect, useState } from 'react';
+import { api } from '../../../lib/api';
+import { useToast } from '../../../context/ToastContext';
 
 export default function Section2() {
-  return (
-    <>
-<div className="px-margin-desktop py-space-lg"> <div className="max-w-[1600px] mx-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-gutter-desktop">  <div className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden"> <div className="flex items-start justify-between"> <div> <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Tổng số phiếu mượn</span> <div className="flex items-baseline gap-2 mt-1"> <span className="font-headline-xl text-headline-xl font-bold text-on-surface">1,842</span> <span className="font-label-md text-label-md text-secondary font-semibold flex items-center"> <span className="material-symbols-outlined text-[16px]">trending_up</span> +24
-              </span> </div> <span className="font-body-sm text-body-sm text-on-surface-variant">Phát sinh trong 24 giờ qua</span> </div> <div className="w-10 h-10 rounded-lg bg-surface-container-low text-primary flex items-center justify-center"> <span className="material-symbols-outlined text-[22px]">auto_stories</span> </div> </div>  <div className="mt-4 pt-2"> <div className="w-full bg-surface-container h-1.5 rounded-full overflow-hidden"> <div className="bg-primary h-full w-[84%] rounded-full" /> </div> <div className="flex justify-between items-center mt-1.5 text-on-surface-variant font-label-sm text-label-sm"> <span>Chỉ tiêu tuần: 84%</span> <span className="font-code-md text-code-md text-outline">HK1-ChuvAn</span> </div> </div> </div>  <div className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden"> <div className="flex items-start justify-between"> <div> <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Đang trong hạn mượn</span> <div className="flex items-baseline gap-2 mt-1"> <span className="font-headline-xl text-headline-xl font-bold text-on-surface">1,420</span> <span className="font-label-md text-label-md text-on-surface-variant font-medium">Chiếm 77.1%</span> </div> <span className="font-body-sm text-body-sm text-on-surface-variant">Độc giả đang giữ tài liệu an toàn</span> </div> <div className="w-10 h-10 rounded-lg bg-secondary-container/30 text-secondary flex items-center justify-center"> <span className="material-symbols-outlined text-[22px]">schedule</span> </div> </div> <div className="mt-4 pt-2"> <div className="w-full bg-surface-container h-1.5 rounded-full overflow-hidden"> <div className="bg-secondary h-full w-[77.1%] rounded-full" /> </div> <div className="flex justify-between items-center mt-1.5 text-on-surface-variant font-label-sm text-label-sm"> <span>Áp lực giá sách: Bình thường</span> <span className="text-secondary font-semibold">Tốt</span> </div> </div> </div>  <div className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden"> <div className="flex items-start justify-between"> <div> <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Phiếu đã hoàn tất</span> <div className="flex items-baseline gap-2 mt-1"> <span className="font-headline-xl text-headline-xl font-bold text-on-surface">374</span> <span className="font-label-md text-label-md text-secondary font-semibold">Đã nhập kho</span> </div> <span className="font-body-sm text-body-sm text-on-surface-variant">Quy trình trả kết thúc trọn vẹn</span> </div> <div className="w-10 h-10 rounded-lg bg-surface-container text-on-surface-variant flex items-center justify-center"> <span className="material-symbols-outlined text-[22px]">task_alt</span> </div> </div> <div className="mt-4 pt-2"> <div className="w-full bg-surface-container h-1.5 rounded-full overflow-hidden"> <div className="bg-primary-container h-full w-[20.3%] rounded-full" /> </div> <div className="flex justify-between items-center mt-1.5 text-on-surface-variant font-label-sm text-label-sm"> <span>Tỷ lệ hoàn thành: 20.3%</span> <span>Kho hoàn lưu</span> </div> </div> </div>  <div className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between relative overflow-hidden"> <div className="flex items-start justify-between"> <div> <span className="font-label-sm text-label-sm uppercase tracking-wider text-error font-semibold flex items-center gap-1"> <span className="w-2 h-2 rounded-full bg-error animate-pulse" />
-              Phát sinh quá hạn
-            </span> <div className="flex items-baseline gap-2 mt-1"> <span className="font-headline-xl text-headline-xl font-bold text-error">48</span> <span className="font-label-md text-label-md text-error font-semibold">phiếu</span> </div> <span className="font-body-sm text-body-sm text-error/80">Cần gửi cảnh báo & phạt lưu giữ</span> </div> <div className="w-10 h-10 rounded-lg bg-error-container text-error flex items-center justify-center"> <span className="material-symbols-outlined text-[22px]">warning</span> </div> </div> <div className="mt-4 pt-2"> <div className="w-full bg-surface-container h-1.5 rounded-full overflow-hidden"> <div className="bg-error h-full w-[12%] rounded-full" /> </div> <div className="flex justify-between items-center mt-1.5 text-error font-label-sm text-label-sm"> <span>Chiếm 2.6% tổng lưu thông</span> <span className="underline font-semibold cursor-pointer">Gửi SMS ngay</span> </div> </div> </div> </div> </div>
-    </>
-  );
+  const toast = useToast();
+  const [counts, setCounts] = useState({ all: 0, borrowing: 0, overdue: 0, renewed2plus: 0, returned: 0 });
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    api('/loans/status-counts')
+      .then((data) => setCounts(data || {}))
+      .catch((e) => toast(e.message || 'Không tải được thống kê phiếu mượn'))
+      .finally(() => setLoading(false));
+  }, [toast]);
+  const cards = [
+    ['Tổng số phiếu mượn', counts.all, 'auto_stories'],
+    ['Đang mượn', counts.borrowing, 'schedule'],
+    ['Quá hạn', counts.overdue, 'warning'],
+    ['Đã hoàn trả', counts.returned, 'assignment_turned_in'],
+  ];
+  return <div className="px-margin-desktop py-space-lg">
+    <div className="max-w-[1600px] mx-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-gutter-desktop">
+      {cards.map(([label, value, icon]) => <div key={label} className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-center justify-between">
+        <div><span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">{label}</span><div className="font-headline-xl text-headline-xl font-bold text-on-surface mt-1">{loading ? '...' : Number(value || 0).toLocaleString('vi-VN')}</div><span className="font-body-sm text-body-sm text-on-surface-variant">Dữ liệu trực tiếp từ hệ thống</span></div>
+        <div className="w-10 h-10 rounded-lg bg-surface-container-low text-primary flex items-center justify-center"><span className="material-symbols-outlined text-[22px]">{icon}</span></div>
+      </div>)}
+    </div>
+    <p className="max-w-[1600px] mx-auto mt-2 text-right font-label-sm text-label-sm text-on-surface-variant">Phiếu có từ 2 lần gia hạn: {loading ? '...' : Number(counts.renewed2plus || 0).toLocaleString('vi-VN')}</p>
+  </div>;
 }
