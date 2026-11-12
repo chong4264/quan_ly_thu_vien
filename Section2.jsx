@@ -1,0 +1,118 @@
+export default function Section2({ stats }) {
+  const {
+    totalPatrons = 0,
+    activePatrons = 0,
+    lockedPatrons = 0,
+    overdueCount = 0,
+  } = stats || {};
+  const activeRate =
+    totalPatrons > 0
+      ? ((activePatrons / totalPatrons) * 100).toFixed(1)
+      : "0.0";
+  const lockedRate =
+    totalPatrons > 0
+      ? ((lockedPatrons / totalPatrons) * 100).toFixed(1)
+      : "0.0";
+
+  return (
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
+        <div className="bg-surface-container-lowest rounded-sm p-space-md shadow-sm flex items-start justify-between relative overflow-hidden">
+          <div className="space-y-1">
+            <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">
+              Tổng số độc giả
+            </span>
+            <div className="flex items-baseline gap-2">
+              <span className="font-headline-xl text-headline-xl text-on-surface font-bold">
+                {totalPatrons.toLocaleString("vi-VN")}
+              </span>
+              <span className="font-label-sm text-label-sm text-secondary font-medium">
+                Dữ liệu hệ thống
+              </span>
+            </div>
+            <p className="font-body-sm text-body-sm text-on-surface-variant">
+              Toàn bộ học sinh và CB-GV
+            </p>
+          </div>
+          <div className="w-10 h-10 bg-surface-container flex items-center justify-center rounded-sm text-primary">
+            <span className="material-symbols-outlined text-[24px]">group</span>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary/30" />
+        </div>
+
+        <div className="bg-surface-container-lowest rounded-sm p-space-md shadow-sm flex items-start justify-between relative overflow-hidden">
+          <div className="space-y-1">
+            <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">
+              Đang hoạt động
+            </span>
+            <div className="flex items-baseline gap-2">
+              <span className="font-headline-xl text-headline-xl text-secondary font-bold">
+                {activePatrons.toLocaleString("vi-VN")}
+              </span>
+              <span className="font-label-sm text-label-sm text-secondary font-medium">
+                {activeRate}%
+              </span>
+            </div>
+            <p className="font-body-sm text-body-sm text-on-surface-variant">
+              Thẻ đủ điều kiện lưu thông sách
+            </p>
+          </div>
+          <div className="w-10 h-10 bg-secondary-container/30 flex items-center justify-center rounded-sm text-secondary">
+            <span className="material-symbols-outlined text-[24px]">
+              check_circle
+            </span>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-secondary/40" />
+        </div>
+
+        <div className="bg-surface-container-lowest rounded-sm p-space-md shadow-sm flex items-start justify-between relative overflow-hidden">
+          <div className="space-y-1">
+            <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">
+              Thẻ bị khóa / Tạm dừng
+            </span>
+            <div className="flex items-baseline gap-2">
+              <span className="font-headline-xl text-headline-xl text-error font-bold">
+                {lockedPatrons.toLocaleString("vi-VN")}
+              </span>
+              <span className="font-label-sm text-label-sm text-error font-medium">
+                {lockedRate}%
+              </span>
+            </div>
+            <p className="font-body-sm text-body-sm text-on-surface-variant">
+              Mất thẻ hoặc vi phạm nội quy
+            </p>
+          </div>
+          <div className="w-10 h-10 bg-error-container/40 flex items-center justify-center rounded-sm text-error">
+            <span className="material-symbols-outlined text-[24px]">block</span>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-error/40" />
+        </div>
+
+        <div className="bg-surface-container-lowest rounded-sm p-space-md shadow-sm flex items-start justify-between relative overflow-hidden">
+          <div className="space-y-1">
+            <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">
+              Đang có sách quá hạn
+            </span>
+            <div className="flex items-baseline gap-2">
+              <span className="font-headline-xl text-headline-xl text-tertiary font-bold">
+                {overdueCount.toLocaleString("vi-VN")}
+              </span>
+              <span className="font-label-sm text-label-sm text-tertiary font-medium">
+                lượt trễ
+              </span>
+            </div>
+            <p className="font-body-sm text-body-sm text-on-surface-variant">
+              Cần gửi thông báo nhắc trả
+            </p>
+          </div>
+          <div className="w-10 h-10 bg-tertiary-fixed flex items-center justify-center rounded-sm text-tertiary">
+            <span className="material-symbols-outlined text-[24px]">
+              alarm_on
+            </span>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-tertiary/40" />
+        </div>
+      </div>
+    </>
+  );
+}
