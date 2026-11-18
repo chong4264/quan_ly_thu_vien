@@ -1,55 +1,209 @@
-import { useState } from 'react';
-import { useToast } from '../../../context/ToastContext';
-
-export default function GiaoDichLuuThong() {
-  const [q,setQ]=useState('');
-  const [gone,setGone]=useState(()=>new Set());
-  const remove=(i)=>setGone((s)=>new Set(s).add(i));
-  const match=(q,t)=>!q.trim()||t.includes(q.trim().toLowerCase());
-  const toast=useToast();
+export default function GiaoDichLuuThong({
+  recentLoans = [],
+  dueSoonList = [],
+  onRemind,
+}) {
   return (
     <>
-<div className="grid grid-cols-1 xl:grid-cols-12 gap-space-lg">  <div className="xl:col-span-8 bg-surface-container-lowest p-space-md rounded-sm shadow-sm flex flex-col justify-between"> <div> <div className="flex items-center justify-between mb-4"> <div className="flex items-center gap-2"> <div className="w-8 h-8 rounded-sm bg-primary-fixed flex items-center justify-center text-primary"> <span className="material-symbols-outlined text-[20px]">swap_horiz</span> </div> <div> <h2 className="font-headline-sm text-headline-sm text-on-surface font-semibold">Giao dịch Lưu thông gần nhất</h2> <p className="font-body-sm text-body-sm text-on-surface-variant">Lượt mượn, trả và gia hạn được ghi nhận trong phiên trực</p> </div> </div> <div className="flex items-center gap-space-sm"> <a href="#" onClick={(e)=>e.preventDefault()} className="px-2.5 py-1 bg-surface-container-low hover:bg-surface-container font-label-md text-label-md text-on-surface rounded-sm transition-colors flex items-center gap-1"> <span className="material-symbols-outlined text-[16px]">filter_list</span>
-              Lọc
-            </a> <a href="#" onClick={(e)=>e.preventDefault()} className="font-label-md text-label-md text-primary font-semibold hover:underline">Xem tất cả phiếu</a> </div> </div>  <div className="overflow-x-auto"> <table className="w-full text-left font-body-sm text-body-sm border-collapse"> <thead> <tr className="bg-surface-container-low text-outline font-label-sm text-label-sm uppercase tracking-wider"> <th className="py-2.5 px-3 font-semibold">Độc giả</th> <th className="py-2.5 px-3 font-semibold">Lớp / Đơn vị</th> <th className="py-2.5 px-3 font-semibold">Tên tài liệu & Mã ĐKCB</th> <th className="py-2.5 px-3 font-semibold">Thời gian</th> <th className="py-2.5 px-3 font-semibold">Thủ thư</th> <th className="py-2.5 px-3 font-semibold text-center">Trạng thái</th> </tr> </thead> <tbody className="divide-none">  <tr className="hover:bg-surface-container-low transition-colors bg-surface-container-lowest" hidden={gone.has(0)||!match(q,"va vũ tuấn anh hs-2022-0418 12 tin học giải thuật lập trình thi đấu c++ (tập 2) dkcb: 004.2-th-092 10:24 am 24/10/2024 n. v. an mượn mới")}> <td className="py-2.5 px-3"> <div className="flex items-center gap-2"> <div className="w-7 h-7 rounded-sm bg-surface-container-high flex items-center justify-center font-bold font-code-md text-primary text-[11px]">
-                      VA
-                    </div> <div> <div className="font-semibold text-on-surface font-label-md text-label-md">Vũ Tuấn Anh</div> <div className="font-code-md text-code-md text-outline">SV-2022-0418</div> </div> </div> </td> <td className="py-2.5 px-3 font-medium text-on-surface">Công nghệ thông tin</td> <td className="py-2.5 px-3"> <div className="font-medium text-on-surface line-clamp-1">Giải thuật Lập trình Thi Đấu C++ (Tập 2)</div> <div className="font-code-md text-code-md text-on-surface-variant font-mono">DKCB: 004.2-TH-092</div> </td> <td className="py-2.5 px-3 text-on-surface-variant whitespace-nowrap"> <div>10:24 AM</div> <div className="text-[11px] text-outline">24/10/2024</div> </td> <td className="py-2.5 px-3 text-on-surface">N. V. An</td> <td className="py-2.5 px-3 text-center whitespace-nowrap"> <span className="inline-flex items-center px-2 py-0.5 rounded-sm font-label-sm text-label-sm font-semibold bg-surface-container-highest text-primary"> <span className="w-1.5 h-1.5 rounded-full bg-primary mr-1" />
-                    Mượn mới
-                  </span> </td> </tr>  <tr className="hover:bg-surface-container-low transition-colors bg-surface-container-low/40" hidden={gone.has(1)||!match(q,"th trần thu hà hs-2023-1102 11 văn 1 truyện kiều & thi pháp trung đại dkcb: 895.9-vh-141 09:50 am 24/10/2024 l. m. hương đã trả sách")}> <td className="py-2.5 px-3"> <div className="flex items-center gap-2"> <div className="w-7 h-7 rounded-sm bg-secondary-fixed flex items-center justify-center font-bold font-code-md text-secondary text-[11px]">
-                      TH
-                    </div> <div> <div className="font-semibold text-on-surface font-label-md text-label-md">Trần Thu Hà</div> <div className="font-code-md text-code-md text-outline">SV-2023-1102</div> </div> </div> </td> <td className="py-2.5 px-3 font-medium text-on-surface">Ngôn ngữ Anh 01</td> <td className="py-2.5 px-3"> <div className="font-medium text-on-surface line-clamp-1">Truyện Kiều & Thi pháp Trung đại</div> <div className="font-code-md text-code-md text-on-surface-variant font-mono">DKCB: 895.9-VH-141</div> </td> <td className="py-2.5 px-3 text-on-surface-variant whitespace-nowrap"> <div>09:50 AM</div> <div className="text-[11px] text-outline">24/10/2024</div> </td> <td className="py-2.5 px-3 text-on-surface">L. M. Hương</td> <td className="py-2.5 px-3 text-center whitespace-nowrap"> <span className="inline-flex items-center px-2 py-0.5 rounded-sm font-label-sm text-label-sm font-semibold bg-secondary-fixed text-on-secondary-fixed"> <span className="w-1.5 h-1.5 rounded-full bg-secondary mr-1" />
-                    Đã trả sách
-                  </span> </td> </tr>  <tr className="hover:bg-surface-container-low transition-colors bg-surface-container-lowest" hidden={gone.has(2)||!match(q,"qm đỗ quang minh hs-2024-0012 10 hóa hóa học hữu cơ nâng cao (tập 1) dkcb: 547.0-hh-003 09:12 am 24/10/2024 n. v. an gia hạn (+7d)")}> <td className="py-2.5 px-3"> <div className="flex items-center gap-2"> <div className="w-7 h-7 rounded-sm bg-primary-fixed-dim flex items-center justify-center font-bold font-code-md text-primary text-[11px]">
-                      QM
-                    </div> <div> <div className="font-semibold text-on-surface font-label-md text-label-md">Đỗ Quang Minh</div> <div className="font-code-md text-code-md text-outline">SV-2024-0012</div> </div> </div> </td> <td className="py-2.5 px-3 font-medium text-on-surface">Công nghệ hóa học</td> <td className="py-2.5 px-3"> <div className="font-medium text-on-surface line-clamp-1">Hóa học Hữu cơ nâng cao (Tập 1)</div> <div className="font-code-md text-code-md text-on-surface-variant font-mono">DKCB: 547.0-HH-003</div> </td> <td className="py-2.5 px-3 text-on-surface-variant whitespace-nowrap"> <div>09:12 AM</div> <div className="text-[11px] text-outline">24/10/2024</div> </td> <td className="py-2.5 px-3 text-on-surface">N. V. An</td> <td className="py-2.5 px-3 text-center whitespace-nowrap"> <span className="inline-flex items-center px-2 py-0.5 rounded-sm font-label-sm text-label-sm font-semibold bg-primary-fixed text-on-primary-fixed-variant"> <span className="w-1.5 h-1.5 rounded-full bg-primary mr-1" />
-                    Gia hạn (+7d)
-                  </span> </td> </tr>  <tr className="hover:bg-surface-container-low transition-colors bg-surface-container-low/40" hidden={gone.has(3)||!match(q,"gv ths. lê hoàng long gv-ly-008 tổ vật lý nguyên lý cơ học lượng tử thực nghiệm dkcb: 530.1-vl-409 08:40 am 24/10/2024 l. m. hương mượn mới")}> <td className="py-2.5 px-3"> <div className="flex items-center gap-2"> <div className="w-7 h-7 rounded-sm bg-tertiary-fixed flex items-center justify-center font-bold font-code-md text-tertiary text-[11px]">
-                      GV
-                    </div> <div> <div className="font-semibold text-on-surface font-label-md text-label-md">ThS. Lê Hoàng Long</div> <div className="font-code-md text-code-md text-outline">GV-VL-008</div> </div> </div> </td> <td className="py-2.5 px-3 font-medium text-on-surface">Bộ môn Vật lý</td> <td className="py-2.5 px-3"> <div className="font-medium text-on-surface line-clamp-1">Nguyên lý Cơ học Lượng tử Thực nghiệm</div> <div className="font-code-md text-code-md text-on-surface-variant font-mono">DKCB: 530.1-VL-409</div> </td> <td className="py-2.5 px-3 text-on-surface-variant whitespace-nowrap"> <div>08:40 AM</div> <div className="text-[11px] text-outline">24/10/2024</div> </td> <td className="py-2.5 px-3 text-on-surface">L. M. Hương</td> <td className="py-2.5 px-3 text-center whitespace-nowrap"> <span className="inline-flex items-center px-2 py-0.5 rounded-sm font-label-sm text-label-sm font-semibold bg-surface-container-highest text-primary"> <span className="w-1.5 h-1.5 rounded-full bg-primary mr-1" />
-                    Mượn mới
-                  </span> </td> </tr>  <tr className="hover:bg-surface-container-low transition-colors bg-surface-container-lowest" hidden={gone.has(4)||!match(q,"pl phan thảo linh hs-2023-0854 11 địa địa lý kinh tế - xã hội thế giới dkcb: 910.0-dl-118 08:15 am 24/10/2024 n. v. an trả trễ hạn (+3d)")}> <td className="py-2.5 px-3"> <div className="flex items-center gap-2"> <div className="w-7 h-7 rounded-sm bg-error-container flex items-center justify-center font-bold font-code-md text-error text-[11px]">
-                      PL
-                    </div> <div> <div className="font-semibold text-on-surface font-label-md text-label-md">Phan Thảo Linh</div> <div className="font-code-md text-code-md text-outline">SV-2023-0854</div> </div> </div> </td> <td className="py-2.5 px-3 font-medium text-on-surface">Quản trị kinh doanh</td> <td className="py-2.5 px-3"> <div className="font-medium text-on-surface line-clamp-1">Địa lý Kinh tế - Xã hội Thế giới</div> <div className="font-code-md text-code-md text-on-surface-variant font-mono">DKCB: 910.0-DL-118</div> </td> <td className="py-2.5 px-3 text-on-surface-variant whitespace-nowrap"> <div>08:15 AM</div> <div className="text-[11px] text-outline">24/10/2024</div> </td> <td className="py-2.5 px-3 text-on-surface">N. V. An</td> <td className="py-2.5 px-3 text-center whitespace-nowrap"> <span className="inline-flex items-center px-2 py-0.5 rounded-sm font-label-sm text-label-sm font-semibold bg-error-container text-on-error-container"> <span className="w-1.5 h-1.5 rounded-full bg-error mr-1" />
-                    Trả trễ hạn (+3d)
-                  </span> </td> </tr> </tbody> </table> </div> </div> <div className="pt-3 font-body-sm text-body-sm text-on-surface-variant flex items-center justify-between border-t-0 mt-3"> <span>Hiển thị 5 / 128 giao dịch hôm nay</span> <div className="flex items-center gap-1 font-label-sm text-label-sm"> <button className="px-2 py-1 rounded-sm bg-surface-container hover:bg-surface-dim text-on-surface" disabled onClick={()=>toast("Trước")}>Trước</button> <span className="px-2 font-semibold text-primary">1</span> <button className="px-2 py-1 rounded-sm bg-surface-container hover:bg-surface-dim text-on-surface" onClick={()=>toast("Sau")}>Sau</button> </div> </div> </div>  <div className="xl:col-span-4 bg-surface-container-lowest p-space-md rounded-sm shadow-sm flex flex-col justify-between"> <div> <div className="flex items-center justify-between mb-3"> <div className="flex items-center gap-2"> <div className="w-8 h-8 rounded-sm bg-error-container flex items-center justify-center text-error"> <span className="material-symbols-outlined text-[20px]">notifications_active</span> </div> <div> <h2 className="font-headline-sm text-headline-sm text-on-surface font-semibold flex items-center gap-1.5">
-                Cảnh báo quá hạn gấp
-                <span className="bg-error text-on-error font-code-md text-[11px] px-1.5 py-0.2 rounded-sm font-bold">48</span> </h2> <p className="font-body-sm text-body-sm text-on-surface-variant">Độc giả trễ hạn trả sách &gt; 7 ngày</p> </div> </div> <button className="bg-error-container text-on-error-container hover:bg-error hover:text-on-error font-label-sm text-label-sm font-semibold px-2.5 py-1 rounded-sm transition-colors flex items-center gap-1" id="sendAllBtn" onClick={()=>toast("Nhắc tất cả")}> <span className="material-symbols-outlined text-[14px]">send</span>
-            Nhắc tất cả
-          </button> </div>  <div className="space-y-3 mt-4">  <div className="p-3 bg-surface-container-low rounded-sm hover:bg-surface-container transition-colors"> <div className="flex items-start justify-between gap-2"> <div> <div className="flex items-center gap-1.5"> <span className="font-label-md text-label-md font-bold text-on-surface">Lê Hoàng Quân</span> <span className="bg-surface-container text-on-surface-variant font-code-md text-[11px] px-1 rounded-sm font-medium">Công nghệ sinh học</span> </div> <div className="font-body-sm text-body-sm text-on-surface mt-0.5">Sinh học Tế bào nâng cao - T.1</div> <div className="flex items-center gap-2 font-code-md text-code-md mt-1"> <span className="text-error font-bold flex items-center gap-0.5"> <span className="material-symbols-outlined text-[14px]">schedule</span>
-                    Quá hạn: 14 ngày
-                  </span> <span className="text-outline">|</span> <span className="text-on-surface-variant">Phạt: 14,000 đ</span> </div> </div> <button className="bg-primary-container hover:bg-primary text-on-primary font-label-sm text-label-sm px-2 py-1 rounded-sm transition-colors flex items-center gap-1 whitespace-nowrap shadow-sm" onClick={()=>toast("Nhắc nhở")}> <span className="material-symbols-outlined text-[13px]">sms</span>
-                Nhắc nhở
-              </button> </div> </div>  <div className="p-3 bg-surface-container-low rounded-sm hover:bg-surface-container transition-colors"> <div className="flex items-start justify-between gap-2"> <div> <div className="flex items-center gap-1.5"> <span className="font-label-md text-label-md font-bold text-on-surface">Ngô Mỹ Duyên</span> <span className="bg-surface-container text-on-surface-variant font-code-md text-[11px] px-1 rounded-sm font-medium">Ngôn ngữ Anh 02</span> </div> <div className="font-body-sm text-body-sm text-on-surface mt-0.5">Oxford Advanced Learner's Dictionary (9th)</div> <div className="flex items-center gap-2 font-code-md text-code-md mt-1"> <span className="text-error font-bold flex items-center gap-0.5"> <span className="material-symbols-outlined text-[14px]">schedule</span>
-                    Quá hạn: 11 ngày
-                  </span> <span className="text-outline">|</span> <span className="text-on-surface-variant">Phạt: 11,000 đ</span> </div> </div> <button className="bg-primary-container hover:bg-primary text-on-primary font-label-sm text-label-sm px-2 py-1 rounded-sm transition-colors flex items-center gap-1 whitespace-nowrap shadow-sm" onClick={()=>toast("Nhắc nhở")}> <span className="material-symbols-outlined text-[13px]">sms</span>
-                Nhắc nhở
-              </button> </div> </div>  <div className="p-3 bg-surface-container-low rounded-sm hover:bg-surface-container transition-colors"> <div className="flex items-start justify-between gap-2"> <div> <div className="flex items-center gap-1.5"> <span className="font-label-md text-label-md font-bold text-on-surface">Trần Đình Trọng</span> <span className="bg-surface-container text-on-surface-variant font-code-md text-[11px] px-1 rounded-sm font-medium">Toán ứng dụng</span> </div> <div className="font-body-sm text-body-sm text-on-surface mt-0.5">Đại số Tuyến tính & Hình học Giải tích</div> <div className="flex items-center gap-2 font-code-md text-code-md mt-1"> <span className="text-error font-bold flex items-center gap-0.5"> <span className="material-symbols-outlined text-[14px]">schedule</span>
-                    Quá hạn: 9 ngày
-                  </span> <span className="text-outline">|</span> <span className="text-on-surface-variant">Phạt: 9,000 đ</span> </div> </div> <button className="bg-primary-container hover:bg-primary text-on-primary font-label-sm text-label-sm px-2 py-1 rounded-sm transition-colors flex items-center gap-1 whitespace-nowrap shadow-sm" onClick={()=>toast("Nhắc nhở")}> <span className="material-symbols-outlined text-[13px]">sms</span>
-                Nhắc nhở
-              </button> </div> </div> </div> </div>  <div className="mt-4 pt-3 flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm"> <span className="flex items-center gap-1 text-[12px]"> <span className="material-symbols-outlined text-[16px] text-outline">info</span>
-          Quy chuẩn phạt trễ: 1,000 đ / ngày
-        </span> <a href="#" onClick={(e)=>e.preventDefault()} className="font-label-md text-label-md text-primary font-semibold hover:underline">Danh sách phạt</a> </div> </div> </div>
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-space-lg">
+        {/* Giao dịch lưu thông gần nhất */}
+        <div className="xl:col-span-8 bg-surface-container-lowest p-space-md rounded-sm shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-sm bg-primary-fixed flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined text-[20px]">
+                    swap_horiz
+                  </span>
+                </div>
+                <div>
+                  <h2 className="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                    Giao dịch Lưu thông gần nhất
+                  </h2>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    Lượt mượn và trả tài liệu mới ghi nhận
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left font-body-sm text-body-sm border-collapse">
+                <thead>
+                  <tr className="bg-surface-container-low text-outline font-label-sm text-label-sm uppercase tracking-wider">
+                    <th className="py-2.5 px-3 font-semibold">Mã phiếu</th>
+                    <th className="py-2.5 px-3 font-semibold">Loại</th>
+                    <th className="py-2.5 px-3 font-semibold">Độc giả</th>
+                    <th className="py-2.5 px-3 font-semibold">
+                      Tên tài liệu & ĐKCB
+                    </th>
+                    <th className="py-2.5 px-3 font-semibold">Thời gian</th>
+                    <th className="py-2.5 px-3 font-semibold">Thủ thư</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-surface-container">
+                  {recentLoans.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="py-6 text-center text-on-surface-variant"
+                      >
+                        Chưa có giao dịch lưu thông nào gần đây.
+                      </td>
+                    </tr>
+                  ) : (
+                    recentLoans.map((item, idx) => {
+                      const timeStr = item.time
+                        ? new Date(item.time).toLocaleString("vi-VN")
+                        : "";
+                      const isBorrow = item.type === "mượn";
+                      return (
+                        <tr
+                          key={idx}
+                          className="hover:bg-surface-container-low transition-colors"
+                        >
+                          <td className="py-2.5 px-3 font-code-md text-code-md font-semibold text-primary">
+                            {item.code}
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <span
+                              className={`inline-flex items-center px-2 py-0.5 rounded-sm font-label-sm text-label-sm font-semibold ${
+                                isBorrow
+                                  ? "bg-primary-fixed text-primary"
+                                  : "bg-secondary-fixed text-on-secondary-fixed"
+                              }`}
+                            >
+                              {item.type}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <div className="font-semibold text-on-surface font-label-md text-label-md">
+                              {item.patron?.fullName || "Khách vãng lai"}
+                            </div>
+                            <div className="font-code-md text-code-md text-outline">
+                              {item.patron?.className}
+                            </div>
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <div className="font-medium text-on-surface line-clamp-1">
+                              {item.bookTitle}
+                            </div>
+                            <div className="font-code-md text-code-md text-outline font-mono">
+                              ĐKCB: {item.accessionNo}
+                            </div>
+                          </td>
+                          <td className="py-2.5 px-3 text-on-surface-variant whitespace-nowrap text-xs">
+                            {timeStr}
+                          </td>
+                          <td className="py-2.5 px-3 text-on-surface">
+                            {item.librarian || "Hệ thống"}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div className="pt-3 font-body-sm text-body-sm text-on-surface-variant flex items-center justify-between border-t mt-3">
+            <span>Hiển thị danh sách giao dịch thực tế từ cơ sở dữ liệu</span>
+          </div>
+        </div>
+
+        {/* Cảnh báo quá hạn gấp 48 giờ */}
+        <div className="xl:col-span-4 bg-surface-container-lowest p-space-md rounded-sm shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-sm bg-error-container flex items-center justify-center text-error">
+                  <span className="material-symbols-outlined text-[20px]">
+                    notifications_active
+                  </span>
+                </div>
+                <div>
+                  <h2 className="font-headline-sm text-headline-sm text-on-surface font-semibold flex items-center gap-1.5">
+                    Cảnh báo quá hạn 48h
+                    <span className="bg-error text-on-error font-code-md text-[11px] px-1.5 py-0.2 rounded-sm font-bold">
+                      {dueSoonList.length}
+                    </span>
+                  </h2>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    Ấn phẩm sắp đến hạn hoặc trễ hạn
+                  </p>
+                </div>
+              </div>
+              <button
+                className="bg-error-container text-on-error-container hover:bg-error hover:text-on-error font-label-sm text-label-sm font-semibold px-2.5 py-1 rounded-sm transition-colors flex items-center gap-1 cursor-pointer"
+                onClick={() => onRemind(dueSoonList.map((i) => i.loanItemId))}
+              >
+                <span className="material-symbols-outlined text-[14px]">
+                  send
+                </span>
+                Nhắc tất cả
+              </button>
+            </div>
+
+            <div className="space-y-3 mt-4 max-h-[360px] overflow-y-auto">
+              {dueSoonList.length === 0 ? (
+                <div className="p-4 text-center text-on-surface-variant text-sm">
+                  Không có cảnh báo quá hạn nào trong 48 giờ tới.
+                </div>
+              ) : (
+                dueSoonList.map((item) => (
+                  <div
+                    key={item.loanItemId}
+                    className="p-3 bg-surface-container-low rounded-sm hover:bg-surface-container transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-label-md text-label-md font-bold text-on-surface">
+                            {item.patron?.fullName || "Độc giả"}
+                          </span>
+                          <span className="bg-surface-container text-on-surface-variant font-code-md text-[11px] px-1 rounded-sm font-medium">
+                            {item.patron?.className}
+                          </span>
+                        </div>
+                        <div className="font-body-sm text-body-sm text-on-surface mt-0.5">
+                          {item.bookTitle}
+                        </div>
+                        <div className="flex items-center gap-2 font-code-md text-code-md mt-1">
+                          <span className="text-error font-bold flex items-center gap-0.5">
+                            <span className="material-symbols-outlined text-[14px]">
+                              schedule
+                            </span>
+                            {item.lateDays > 0
+                              ? `Quá hạn: ${item.lateDays} ngày`
+                              : `Còn lại: ${item.hoursLeft} giờ`}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        className="bg-primary-container hover:bg-primary text-on-primary font-label-sm text-label-sm px-2 py-1 rounded-sm transition-colors flex items-center gap-1 whitespace-nowrap shadow-sm cursor-pointer"
+                        onClick={() => onRemind([item.loanItemId])}
+                      >
+                        <span className="material-symbols-outlined text-[13px]">
+                          sms
+                        </span>
+                        Nhắc nhở
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+          <div className="mt-4 pt-3 flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm border-t">
+            <span className="flex items-center gap-1 text-[12px]">
+              <span className="material-symbols-outlined text-[16px] text-outline">
+                info
+              </span>
+              Tự động quét từ hệ thống Strapi
+            </span>
+          </div>
+        </div>
+      </div>
     </>
   );
 }
